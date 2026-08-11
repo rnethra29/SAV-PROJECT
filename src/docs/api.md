@@ -91,6 +91,16 @@ Reference: [`SAV_ERP_Commercial_Lifecycle_Module_Architecture.md`](../../SAV_ERP
 | POST | `/approvals` | one Pending row per (entity, stage) |
 | POST | `/approvals/:id/approve` \| `/reject` | Approver/Admin or the assigned `approver_id` |
 
+Gated transitions (`src/models/approvalStages.js`) — each requires a matching **Approved** `com_approvals` row first, or the request 409s with `code: APPROVAL_REQUIRED`:
+| Entity | Gated transition | Stage |
+|---|---|---|
+| RFQ | `status -> 'Under Estimation'` | `RFQ Approval` |
+| Estimation | `status -> 'Approved'` | `Estimation Approval` |
+| Quotation | `status -> 'Approved'` | `Quotation Approval` |
+| Negotiation Offer | `is_final -> true` | `Final Commercial Decision Approval` (checked against the `quotation_item_id`, or `quotation_id` for a quotation-level offer) |
+| BOQ | `status -> 'Final'` | `BOQ Final Approval` |
+| PO | `status -> 'Approved'` | `PO Approval` |
+
 ## Audit Log (Phase 5.17, read-only)
 | Method | Path |
 |---|---|

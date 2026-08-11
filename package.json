@@ -10,7 +10,7 @@
     "migrate": "node src/database/migrate.js up",
     "migrate:down": "node src/database/migrate.js down",
     "seed": "node src/database/seed.js",
-    "test": "node --test src/tests"
+    "test": "node --test"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",

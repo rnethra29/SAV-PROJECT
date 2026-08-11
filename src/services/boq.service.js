@@ -6,10 +6,12 @@ const rfqRepository = require('../repositories/rfq.repository');
 const quotationRepository = require('../repositories/quotation.repository');
 const rfqItemRepository = require('../repositories/rfqItem.repository');
 const auditService = require('./audit.service');
+const approvalService = require('./approval.service');
 const ApiError = require('../utils/apiError');
 const { transaction, query } = require('../config/database');
 const { wordCount } = require('../utils/helpers');
 const { BOQ_TRANSITIONS, isValidTransition } = require('../models/statusTransitions');
+const { APPROVAL_STAGES } = require('../models/approvalStages');
 const { resolveUnitRate } = require('./boqItem.service');
 
 async function list(user, reqQuery) {
@@ -224,6 +226,10 @@ async function update(id, data, user) {
   const existing = await getById(id, user);
   if (data.status && !isValidTransition(BOQ_TRANSITIONS, existing.status, data.status)) {
     throw ApiError.badRequest(`Invalid BOQ status transition: '${existing.status}' -> '${data.status}'`, { code: 'INVALID_STATUS_TRANSITION' });
+  }
+
+  if (data.status === 'Final' && !(await approvalService.isApproved('BOQ', id, APPROVAL_STAGES.BOQ))) {
+    throw ApiError.conflict(`BOQ cannot be marked 'Final' without an Approved '${APPROVAL_STAGES.BOQ}' record`, { code: 'APPROVAL_REQUIRED' });
   }
 
   return transaction(async (client) => {

@@ -5,9 +5,11 @@ const poItemRepository = require('../repositories/poItem.repository');
 const boqRepository = require('../repositories/boq.repository');
 const boqItemRepository = require('../repositories/boqItem.repository');
 const auditService = require('./audit.service');
+const approvalService = require('./approval.service');
 const ApiError = require('../utils/apiError');
 const { transaction } = require('../config/database');
 const { PO_TRANSITIONS, isValidTransition } = require('../models/statusTransitions');
+const { APPROVAL_STAGES } = require('../models/approvalStages');
 
 async function list(user, reqQuery) {
   return poRepository.findAll({
@@ -115,6 +117,10 @@ async function update(id, data, user) {
   const existing = await getById(id, user);
   if (data.status && !isValidTransition(PO_TRANSITIONS, existing.status, data.status)) {
     throw ApiError.badRequest(`Invalid PO status transition: '${existing.status}' -> '${data.status}'`, { code: 'INVALID_STATUS_TRANSITION' });
+  }
+
+  if (data.status === 'Approved' && !(await approvalService.isApproved('PO', id, APPROVAL_STAGES.PO))) {
+    throw ApiError.conflict(`PO cannot be marked 'Approved' without an Approved '${APPROVAL_STAGES.PO}' record`, { code: 'APPROVAL_REQUIRED' });
   }
 
   return transaction(async (client) => {

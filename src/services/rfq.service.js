@@ -3,9 +3,11 @@
 const rfqRepository = require('../repositories/rfq.repository');
 const rfqItemRepository = require('../repositories/rfqItem.repository');
 const auditService = require('./audit.service');
+const approvalService = require('./approval.service');
 const ApiError = require('../utils/apiError');
 const { transaction } = require('../config/database');
 const { RFQ_TRANSITIONS, isValidTransition } = require('../models/statusTransitions');
+const { APPROVAL_STAGES } = require('../models/approvalStages');
 
 async function list(user, reqQuery) {
   return rfqRepository.findAll({
@@ -42,6 +44,11 @@ async function update(id, data, user) {
 
   if (data.status && !isValidTransition(RFQ_TRANSITIONS, existing.status, data.status)) {
     throw ApiError.badRequest(`Invalid RFQ status transition: '${existing.status}' -> '${data.status}'`, { code: 'INVALID_STATUS_TRANSITION' });
+  }
+
+  // Architecture Phase 8 rule #13 / Phase 1.2: estimation work may not begin without an Approved RFQ sign-off on record.
+  if (data.status === 'Under Estimation' && !(await approvalService.isApproved('RFQ', id, APPROVAL_STAGES.RFQ))) {
+    throw ApiError.conflict(`RFQ cannot move to 'Under Estimation' without an Approved '${APPROVAL_STAGES.RFQ}' record`, { code: 'APPROVAL_REQUIRED' });
   }
 
   return transaction(async (client) => {

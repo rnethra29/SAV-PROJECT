@@ -4,9 +4,11 @@ const quotationRepository = require('../repositories/quotation.repository');
 const quotationItemRepository = require('../repositories/quotationItem.repository');
 const rfqRepository = require('../repositories/rfq.repository');
 const auditService = require('./audit.service');
+const approvalService = require('./approval.service');
 const ApiError = require('../utils/apiError');
 const { transaction, query } = require('../config/database');
 const { QUOTATION_TRANSITIONS, isValidTransition } = require('../models/statusTransitions');
+const { APPROVAL_STAGES } = require('../models/approvalStages');
 
 async function list(user, reqQuery) {
   return quotationRepository.findAll({
@@ -137,6 +139,10 @@ async function update(id, data, user) {
 
   if (data.status && !isValidTransition(QUOTATION_TRANSITIONS, existing.status, data.status)) {
     throw ApiError.badRequest(`Invalid Quotation status transition: '${existing.status}' -> '${data.status}'`, { code: 'INVALID_STATUS_TRANSITION' });
+  }
+
+  if (data.status === 'Approved' && !(await approvalService.isApproved('Quotation', id, APPROVAL_STAGES.QUOTATION))) {
+    throw ApiError.conflict(`Quotation cannot be marked 'Approved' without an Approved '${APPROVAL_STAGES.QUOTATION}' record`, { code: 'APPROVAL_REQUIRED' });
   }
 
   return transaction(async (client) => {

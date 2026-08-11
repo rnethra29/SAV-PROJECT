@@ -4,9 +4,11 @@ const estimationRepository = require('../repositories/estimation.repository');
 const estimationItemRepository = require('../repositories/estimationItem.repository');
 const rfqRepository = require('../repositories/rfq.repository');
 const auditService = require('./audit.service');
+const approvalService = require('./approval.service');
 const ApiError = require('../utils/apiError');
 const { transaction } = require('../config/database');
 const { ESTIMATION_TRANSITIONS, isValidTransition } = require('../models/statusTransitions');
+const { APPROVAL_STAGES } = require('../models/approvalStages');
 
 async function list(user, reqQuery) {
   return estimationRepository.findAll({
@@ -46,6 +48,10 @@ async function update(id, data, user) {
 
   if (data.status && !isValidTransition(ESTIMATION_TRANSITIONS, existing.status, data.status)) {
     throw ApiError.badRequest(`Invalid Estimation status transition: '${existing.status}' -> '${data.status}'`, { code: 'INVALID_STATUS_TRANSITION' });
+  }
+
+  if (data.status === 'Approved' && !(await approvalService.isApproved('Estimation', id, APPROVAL_STAGES.ESTIMATION))) {
+    throw ApiError.conflict(`Estimation cannot be marked 'Approved' without an Approved '${APPROVAL_STAGES.ESTIMATION}' record`, { code: 'APPROVAL_REQUIRED' });
   }
 
   return transaction(async (client) => {

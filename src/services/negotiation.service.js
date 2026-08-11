@@ -4,8 +4,10 @@ const negotiationOfferRepository = require('../repositories/negotiationOffer.rep
 const quotationRepository = require('../repositories/quotation.repository');
 const quotationItemRepository = require('../repositories/quotationItem.repository');
 const auditService = require('./audit.service');
+const approvalService = require('./approval.service');
 const ApiError = require('../utils/apiError');
 const { transaction } = require('../config/database');
+const { APPROVAL_STAGES } = require('../models/approvalStages');
 
 async function listByQuotation(quotationId, user, pagination) {
   const quotation = await quotationRepository.findById(quotationId, { companyId: user.companyId });
@@ -42,6 +44,18 @@ async function create(data, user) {
     const item = await quotationItemRepository.findById(data.quotation_item_id, { companyId: user.companyId });
     if (!item) throw ApiError.badRequest('quotation_item_id does not exist');
     if (item.quotation_id !== data.quotation_id) throw ApiError.badRequest('quotation_item_id must belong to the given quotation_id');
+  }
+
+  // Architecture Phase 8 rule #13 / Phase 1.2: the settled negotiation outcome may not be locked in as `is_final`
+  // without an Approved "Final Commercial Decision" sign-off on record for this item (or quotation, if item-level).
+  if (data.is_final) {
+    const gateEntityId = data.quotation_item_id || data.quotation_id;
+    if (!(await approvalService.isApproved('FinalCommercialDecision', gateEntityId, APPROVAL_STAGES.FINAL_COMMERCIAL_DECISION))) {
+      throw ApiError.conflict(
+        `An offer cannot be marked is_final=true without an Approved '${APPROVAL_STAGES.FINAL_COMMERCIAL_DECISION}' record for this ${data.quotation_item_id ? 'quotation item' : 'quotation'}`,
+        { code: 'APPROVAL_REQUIRED' }
+      );
+    }
   }
 
   return transaction(async (client) => {
