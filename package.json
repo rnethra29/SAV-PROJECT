@@ -1,0 +1,38 @@
+{
+  "name": "sav-erp-commercial-module",
+  "version": "1.0.0",
+  "description": "SAV ERP - Commercial Lifecycle Module (RFQ -> Estimation -> Market Price -> Actual vs Quoted -> Profit -> Quotation -> Negotiation -> BOQ -> PO) backend API",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "migrate": "node src/database/migrate.js up",
+    "migrate:down": "node src/database/migrate.js down",
+    "seed": "node src/database/seed.js",
+    "test": "node --test src/tests"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-async-errors": "^3.1.1",
+    "helmet": "^7.1.0",
+    "joi": "^17.13.3",
+    "jose": "^5.9.6",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "multer": "^2.0.0",
+    "pg": "^8.12.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^11.1.0",
+    "winston": "^3.14.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
