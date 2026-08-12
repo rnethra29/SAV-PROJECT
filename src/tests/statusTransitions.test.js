@@ -9,6 +9,10 @@ const {
   QUOTATION_TRANSITIONS,
   BOQ_TRANSITIONS,
   PO_TRANSITIONS,
+  CLM_CLIENT_TRANSITIONS,
+  CLM_REQUIREMENT_TRANSITIONS,
+  CLM_INVOICE_TRANSITIONS,
+  CLM_PAYMENT_VERIFICATION_TRANSITIONS,
   isValidTransition,
 } = require('../models/statusTransitions');
 
@@ -85,5 +89,46 @@ describe('PO status machine', () => {
   test('Closed and Cancelled are terminal', () => {
     assert.deepEqual(PO_TRANSITIONS.Closed, []);
     assert.deepEqual(PO_TRANSITIONS.Cancelled, []);
+  });
+});
+
+describe('Client Management submodule status machines (Sites module)', () => {
+  test('client: Prospect -> Active -> Inactive -> Active is a valid round trip; Blacklisted is terminal', () => {
+    assert.equal(isValidTransition(CLM_CLIENT_TRANSITIONS, 'Prospect', 'Active'), true);
+    assert.equal(isValidTransition(CLM_CLIENT_TRANSITIONS, 'Active', 'Inactive'), true);
+    assert.equal(isValidTransition(CLM_CLIENT_TRANSITIONS, 'Inactive', 'Active'), true);
+    assert.deepEqual(CLM_CLIENT_TRANSITIONS.Blacklisted, []);
+  });
+
+  test('requirement: happy path New -> Under Review -> Converted to RFQ -> Under Estimation -> Quoted -> Won', () => {
+    const path = ['New', 'Under Review', 'Converted to RFQ', 'Under Estimation', 'Quoted', 'Won'];
+    for (let i = 0; i < path.length - 1; i++) {
+      assert.equal(isValidTransition(CLM_REQUIREMENT_TRANSITIONS, path[i], path[i + 1]), true, `${path[i]} -> ${path[i + 1]}`);
+    }
+    assert.deepEqual(CLM_REQUIREMENT_TRANSITIONS.Won, []);
+  });
+
+  test('requirement: cannot skip straight from New to Quoted', () => {
+    assert.equal(isValidTransition(CLM_REQUIREMENT_TRANSITIONS, 'New', 'Quoted'), false);
+  });
+
+  test('invoice: Draft -> Submitted -> Approved -> Partially Paid -> Paid is valid; Paid/Cancelled are terminal', () => {
+    const path = ['Draft', 'Submitted', 'Approved', 'Partially Paid', 'Paid'];
+    for (let i = 0; i < path.length - 1; i++) {
+      assert.equal(isValidTransition(CLM_INVOICE_TRANSITIONS, path[i], path[i + 1]), true, `${path[i]} -> ${path[i + 1]}`);
+    }
+    assert.deepEqual(CLM_INVOICE_TRANSITIONS.Paid, []);
+    assert.deepEqual(CLM_INVOICE_TRANSITIONS.Cancelled, []);
+  });
+
+  test('invoice: cannot skip straight from Draft to Approved (must pass through Submitted)', () => {
+    assert.equal(isValidTransition(CLM_INVOICE_TRANSITIONS, 'Draft', 'Approved'), false);
+  });
+
+  test('payment verification: Pending -> Verified/Rejected only, both terminal', () => {
+    assert.equal(isValidTransition(CLM_PAYMENT_VERIFICATION_TRANSITIONS, 'Pending', 'Verified'), true);
+    assert.equal(isValidTransition(CLM_PAYMENT_VERIFICATION_TRANSITIONS, 'Pending', 'Rejected'), true);
+    assert.deepEqual(CLM_PAYMENT_VERIFICATION_TRANSITIONS.Verified, []);
+    assert.deepEqual(CLM_PAYMENT_VERIFICATION_TRANSITIONS.Rejected, []);
   });
 });

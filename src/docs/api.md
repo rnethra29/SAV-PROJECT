@@ -100,6 +100,7 @@ Gated transitions (`src/models/approvalStages.js`) — each requires a matching 
 | Negotiation Offer | `is_final -> true` | `Final Commercial Decision Approval` (checked against the `quotation_item_id`, or `quotation_id` for a quotation-level offer) |
 | BOQ | `status -> 'Final'` | `BOQ Final Approval` |
 | PO | `status -> 'Approved'` | `PO Approval` |
+| Client Invoice (Client Management submodule) | `status -> 'Approved'` | `Client Invoice Approval` |
 
 ## Audit Log (Phase 5.17, read-only)
 | Method | Path |
@@ -116,6 +117,54 @@ Gated transitions (`src/models/approvalStages.js`) — each requires a matching 
 
 ## Lookups
 `GET/POST/PATCH /lookups/item-categories`, `/price-source-types`, `/document-categories`, plus `POST .../:id/deactivate`.
+
+---
+
+# Sites module — Client Management submodule
+
+Reference: [`SAV_ERP_Client_Management_Module_Architecture.md`](../../SAV_ERP_Client_Management_Module_Architecture.md). Owns `clm_*` tables only; the RFQ->PO chain, Documents, Approvals and Audit Log above are **reused by FK / `entity_type` value**, not redefined (doc §2).
+
+## Clients (§6.3)
+| Method | Path | Notes |
+|---|---|---|
+| GET/POST | `/clients` | filter `status`, `clientTypeId`, `industryId`; POST: Sales/Commercial Manager |
+| GET/PATCH/DELETE | `/clients/:id` | status transitions validated (`CLM_CLIENT_TRANSITIONS`); DELETE blocked if contacts/requirements/invoices/payments exist |
+| GET | `/clients/:clientId/360` | assembled from `019_clm_views.sql` — overview, financial summary, projects, RFQ/BOQ/PO summaries, billing/payment summary, outstanding, cost utilization, profit analysis |
+| GET | `/clients/:clientId/rfqs` | proxies `/rfqs` filtered by `client_id` |
+| GET | `/clients/:clientId/projects` | proxies the external `projects` table |
+| GET | `/clients/:clientId/documents` | `com_documents` filtered to every entity this client owns |
+| GET | `/clients/:clientId/activity` | `v_client_activity_history` (audit log + status history, unioned) |
+
+## Client Contacts (§6.4)
+| Method | Path | Notes |
+|---|---|---|
+| GET/POST | `/clients/:clientId/contacts` | one primary contact per `(client_id, contact_type_id)`, not client-wide |
+| GET/PATCH/DELETE | `/client-contacts/:id` | |
+
+## Client Requirements (§6.6, pre-RFQ)
+| Method | Path | Notes |
+|---|---|---|
+| GET/POST | `/client-requirements`, `/clients/:clientId/requirements` | filter `clientId`, `status`, `priority`; POST: Sales/Commercial Manager, Estimation Engineer |
+| GET/PATCH/DELETE | `/client-requirements/:id` | status transitions validated (`CLM_REQUIREMENT_TRANSITIONS`); status changes append to `clm_client_status_history` |
+
+## Client Invoices / Billing (§6.7/§6.8)
+| Method | Path | Notes |
+|---|---|---|
+| GET/POST | `/client-invoices`, `/clients/:clientId/invoices` | POST: Finance/Accounts Team; `net_amount` is DB-generated, never accepted |
+| GET/PATCH/DELETE | `/client-invoices/:id` | `status -> 'Approved'` requires an Approved `Client Invoice Approval` record (`code: APPROVAL_REQUIRED`) |
+| GET/POST | `/client-invoices/:invoiceId/lines` | only while the invoice is `Draft` |
+| GET/PATCH/DELETE | `/invoice-lines/:id` | |
+
+## Payments + Allocations (§6.9/§6.10)
+| Method | Path | Notes |
+|---|---|---|
+| GET/POST | `/client-payments`, `/clients/:clientId/payments` | POST: Finance/Accounts Team |
+| GET/PATCH/DELETE | `/client-payments/:id` | amount immutable once allocated |
+| POST | `/client-payments/:id/verify` | `{ status: 'Verified'\|'Rejected', remarks? }` |
+| GET/POST | `/client-payments/:paymentId/allocations` | append-only; DB trigger + app-level pre-check guard against over-allocating past the payment amount or the invoice net amount |
+
+## Lookups (§6.1/§6.2/§6.4 note)
+`GET/POST/PATCH /client-lookups/client-types`, `/industries`, `/contact-types`, plus `POST .../:id/deactivate`.
 
 ## Auth model
 `auth.middleware.js` verifies the Supabase Auth JWT and expects `company_id`/`branch_id`/`role` custom claims (`app_metadata`), provisioned by a Supabase custom-access-token hook against the external `users`/`employees` tables. `role.middleware.js` gates by the Actors in architecture Phase 1.2 (`models/enums.js: ROLES`); `Admin` always passes.

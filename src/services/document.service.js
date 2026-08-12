@@ -18,6 +18,12 @@ const ENTITY_TABLE_MAP = {
   ClientOffer: { table: 'com_negotiation_offers', pk: 'offer_id' },
   BOQ: { table: 'com_boq', pk: 'boq_id' },
   PO: { table: 'com_po', pk: 'po_id' },
+  // Sites module -> Client Management submodule (com_documents extended, not duplicated - doc §16)
+  Client: { table: 'clm_client', pk: 'client_id' },
+  ClientContact: { table: 'clm_client_contact', pk: 'contact_id' },
+  ClientRequirement: { table: 'clm_client_requirement', pk: 'requirement_id' },
+  ClientInvoice: { table: 'clm_client_invoice', pk: 'invoice_id' },
+  ClientPayment: { table: 'clm_payment', pk: 'payment_id' },
 };
 
 async function assertEntityExists(entityType, entityId, companyId) {

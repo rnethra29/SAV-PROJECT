@@ -21,6 +21,10 @@ const APPROVAL_STAGES = Object.freeze({
   FINAL_COMMERCIAL_DECISION: 'Final Commercial Decision Approval',
   BOQ: 'BOQ Final Approval',
   PO: 'PO Approval',
+  // Client Management submodule (Sites module) gate: doc §15 Security -
+  // "only Approver roles can transition clm_client_invoice.status from
+  // Submitted -> Approved".
+  CLIENT_INVOICE: 'Client Invoice Approval',
 });
 
 module.exports = { APPROVAL_STAGES };

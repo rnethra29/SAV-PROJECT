@@ -66,6 +66,48 @@ const PO_TRANSITIONS = {
 };
 
 /**
+ * Client Management submodule (Sites module) state machines. Not specified
+ * verbatim in that module's architecture doc either (which only enumerates
+ * the ENUM value sets, doc §9/§6) - derived the same way as the maps above,
+ * from the workflow narrative in doc §1/§17 and the natural reading of each
+ * enum's ordering.
+ */
+const CLM_CLIENT_TRANSITIONS = {
+  Prospect: ['Active', 'Inactive', 'Blacklisted'],
+  Active: ['Inactive', 'Blacklisted'],
+  Inactive: ['Active', 'Blacklisted'],
+  Blacklisted: [],
+};
+
+const CLM_REQUIREMENT_TRANSITIONS = {
+  New: ['Under Review', 'Cancelled'],
+  'Under Review': ['Converted to RFQ', 'Cancelled'],
+  'Converted to RFQ': ['Under Estimation', 'Cancelled'],
+  'Under Estimation': ['Quoted', 'Cancelled'],
+  Quoted: ['Won', 'Lost', 'Cancelled'],
+  Won: [],
+  Lost: [],
+  Cancelled: [],
+};
+
+const CLM_INVOICE_TRANSITIONS = {
+  Draft: ['Submitted', 'Cancelled'],
+  Submitted: ['Approved', 'Cancelled'],
+  Approved: ['Partially Paid', 'Paid', 'Overdue', 'Cancelled'],
+  'Partially Paid': ['Paid', 'Overdue', 'Cancelled'],
+  Overdue: ['Partially Paid', 'Paid', 'Cancelled'],
+  Paid: [],
+  Cancelled: [],
+};
+
+/** Payment verification is a one-shot decision (doc §15) - a rejected payment record is corrected via a new row, not reopened, consistent with the module's ledger-pattern convention. */
+const CLM_PAYMENT_VERIFICATION_TRANSITIONS = {
+  Pending: ['Verified', 'Rejected'],
+  Verified: [],
+  Rejected: [],
+};
+
+/**
  * @param {Record<string, string[]>} transitions
  * @param {string} from
  * @param {string} to
@@ -81,5 +123,9 @@ module.exports = {
   QUOTATION_TRANSITIONS,
   BOQ_TRANSITIONS,
   PO_TRANSITIONS,
+  CLM_CLIENT_TRANSITIONS,
+  CLM_REQUIREMENT_TRANSITIONS,
+  CLM_INVOICE_TRANSITIONS,
+  CLM_PAYMENT_VERIFICATION_TRANSITIONS,
   isValidTransition,
 };
