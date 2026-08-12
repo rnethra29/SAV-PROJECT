@@ -32,7 +32,7 @@
   /* KPI card semantic colors (identity-based, independent of status colors) */
   --kpi-neutral: #f3eee4;
   --kpi-operational: #3b2a1f;
-  --kpi-analytics: #2a8c82;
+  --kpi-analytics: #34746f;
   --kpi-financial: #c9a66b;
 }
 
