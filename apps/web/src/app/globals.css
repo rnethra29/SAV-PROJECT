@@ -64,3 +64,27 @@ body {
   color: var(--text-primary);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
+
+/*
+ * Thin, subtle scrollbar for the sidebar nav — used only where the nav
+ * list genuinely exceeds the viewport. Deliberately not a global
+ * scrollbar reset; the app shell's one real scroll container (<main>)
+ * keeps the browser's normal scrollbar.
+ */
+.scrollbar-thin-sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--text-on-sidebar) 25%, transparent) transparent;
+}
+.scrollbar-thin-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+.scrollbar-thin-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin-sidebar::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--text-on-sidebar) 25%, transparent);
+  border-radius: 9999px;
+}
+.scrollbar-thin-sidebar::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--text-on-sidebar) 40%, transparent);
+}

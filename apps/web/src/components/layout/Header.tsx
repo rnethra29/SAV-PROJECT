@@ -1,26 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 import { MenuIcon, SearchIcon, BellIcon, SunIcon, PlusIcon, ChevronDownIcon } from "@/components/ui/icons";
+import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 
 type HeaderProps = {
   onOpenMobileNav: () => void;
 };
 
-// Explicit per-route breadcrumb trail rather than deriving one from the
-// path segments — keeps wording (e.g. "New RFQ", not "new") under our
-// control and avoids inventing a breadcrumb for routes that don't exist
-// yet (Administration links are not real pages). Falls back to Dashboard.
-const BREADCRUMBS: Record<string, string[]> = {
-  "/dashboard": ["Dashboard"],
-  "/commercial/rfq": ["Commercial", "RFQ"],
-  "/commercial/rfq/new": ["Commercial", "RFQ", "New RFQ"],
-};
-
 export function Header({ onOpenMobileNav }: HeaderProps) {
-  const pathname = usePathname();
-  const breadcrumbSegments = BREADCRUMBS[pathname] ?? BREADCRUMBS["/dashboard"];
   // Client-only date: avoided at SSR time to prevent a server/client
   // render-time mismatch, not because the date itself is sensitive.
   const [now, setNow] = useState<Date | null>(null);
@@ -55,15 +43,7 @@ export function Header({ onOpenMobileNav }: HeaderProps) {
         <MenuIcon className="h-5 w-5" />
       </button>
 
-      <div className="hidden items-center gap-1.5 text-sm text-text-secondary md:flex">
-        <span className="font-medium text-text-primary">SAV Wind Foundations</span>
-        {breadcrumbSegments.map((segment, index) => (
-          <span key={`${segment}-${index}`} className="flex items-center gap-1.5">
-            <span>/</span>
-            <span>{segment}</span>
-          </span>
-        ))}
-      </div>
+      <Breadcrumbs />
 
       <div className="ml-auto flex items-center gap-2 lg:gap-3">
         <div className="relative hidden lg:block">

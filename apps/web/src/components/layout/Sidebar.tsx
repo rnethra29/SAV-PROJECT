@@ -111,7 +111,7 @@ export function Sidebar({ isCollapsed, onToggleCollapse, isMobileOpen, onCloseMo
           <Logo variant={isCollapsed ? "mark" : "full"} />
         </div>
 
-        <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-5">
+        <nav className="scrollbar-thin-sidebar flex-1 space-y-6 overflow-y-auto px-3 py-5">
           <div className="space-y-1">{primaryNav.map(renderLink)}</div>
           <div>
             {!isCollapsed && (
