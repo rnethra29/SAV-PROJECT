@@ -59,7 +59,7 @@ export function MarketPriceAnalysisPanel({ groups }: MarketPriceAnalysisPanelPro
               </thead>
               <tbody>
                 {references.map((ref) => (
-                  <tr key={ref.id} className="border-b border-border last:border-0">
+                  <tr key={ref.id} className="border-b border-border transition-colors last:border-0 hover:bg-background/60">
                     <td className="px-4 py-2.5 text-text-primary">{ref.sourceTypeName}</td>
                     <td className="px-4 py-2.5 text-text-secondary">{ref.sourceReference ?? "—"}</td>
                     <td className="px-4 py-2.5 text-right font-medium text-text-primary">

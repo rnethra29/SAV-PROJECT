@@ -3,6 +3,9 @@ import Link from "next/link";
 import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SearchIcon } from "@/components/ui/icons";
+import { MetricCard } from "@/components/dashboard/MetricCard";
+import { PageHeader } from "@/components/commercial/shared/PageHeader";
+import { BarRow } from "@/components/commercial/shared/BarRow";
 import { getRfqList, getRfqItems, isHeaderRfqItem } from "@/lib/fixtures/rfq";
 import { getMarketPriceReferencesForRfq } from "@/lib/fixtures/market-price";
 
@@ -25,16 +28,15 @@ export default async function MarketPriceOverviewPage() {
     )
   ).filter((row): row is NonNullable<typeof row> => row !== null);
 
+  const totalItemsPriced = rows.reduce((sum, r) => sum + r.pricedItemCount, 0);
+  const totalReferences = rows.reduce((sum, r) => sum + r.referenceCount, 0);
+
   return (
     <div className="space-y-6 2xl:mx-auto 2xl:max-w-[1600px]">
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight text-text-primary lg:text-2xl">
-          Market Price Analysis
-        </h1>
-        <p className="mt-1 text-sm text-text-secondary">
-          Reference prices gathered per RFQ item — current market, internal purchase and historical project rates.
-        </p>
-      </div>
+      <PageHeader
+        title="Market Price Analysis"
+        description="Reference prices gathered per RFQ item — current market, internal purchase and historical project rates."
+      />
 
       {rows.length === 0 ? (
         <Panel className="bg-surface">
@@ -45,37 +47,64 @@ export default async function MarketPriceOverviewPage() {
           />
         </Panel>
       ) : (
-        <Panel className="bg-surface overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-border text-text-secondary">
-              <tr>
-                <th className="px-5 py-3 font-medium">RFQ</th>
-                <th className="px-5 py-3 font-medium">Client / Project</th>
-                <th className="px-5 py-3 text-right font-medium">Items Priced</th>
-                <th className="px-5 py-3 text-right font-medium">Reference Records</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(({ rfq, referenceCount, pricedItemCount, itemCount }) => (
-                <tr key={rfq.id} className="border-b border-border last:border-0">
-                  <td className="px-5 py-3 font-medium">
-                    <Link href={`/commercial/rfq/${rfq.id}/market-price`} className="text-secondary hover:underline">
-                      {rfq.rfqNumber}
-                    </Link>
-                  </td>
-                  <td className="px-5 py-3">
-                    <div className="text-text-primary">{rfq.clientName}</div>
-                    <div className="text-text-secondary">{rfq.projectName}</div>
-                  </td>
-                  <td className="px-5 py-3 text-right text-text-secondary">
-                    {pricedItemCount} / {itemCount}
-                  </td>
-                  <td className="px-5 py-3 text-right text-text-secondary">{referenceCount}</td>
-                </tr>
+        <>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <MetricCard label="RFQs with Pricing" value={rows.length} variant="neutral" />
+            <MetricCard label="Items Priced" value={totalItemsPriced} variant="operational" />
+            <MetricCard label="Reference Records" value={totalReferences} variant="analytics" />
+          </div>
+
+          <Panel className="bg-surface p-5">
+            <h2 className="text-sm font-semibold text-text-primary">Reference Coverage by RFQ</h2>
+            <p className="mt-0.5 text-xs text-text-secondary">Share of line items with at least one market price reference.</p>
+            <div className="mt-5 space-y-3">
+              {rows.map(({ rfq, pricedItemCount, itemCount }) => (
+                <Link key={rfq.id} href={`/commercial/rfq/${rfq.id}/market-price`} className="block">
+                  <BarRow
+                    label={rfq.rfqNumber}
+                    value={itemCount > 0 ? (pricedItemCount / itemCount) * 100 : 0}
+                    max={100}
+                    valueLabel={`${pricedItemCount} / ${itemCount} items`}
+                    color="var(--secondary)"
+                    labelClassName="w-32 shrink-0 truncate text-xs text-secondary hover:underline"
+                  />
+                </Link>
               ))}
-            </tbody>
-          </table>
-        </Panel>
+            </div>
+          </Panel>
+
+          <Panel className="bg-surface overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-border text-text-secondary">
+                <tr>
+                  <th className="px-5 py-3 font-medium">RFQ</th>
+                  <th className="px-5 py-3 font-medium">Client / Project</th>
+                  <th className="px-5 py-3 text-right font-medium">Items Priced</th>
+                  <th className="px-5 py-3 text-right font-medium">Reference Records</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map(({ rfq, referenceCount, pricedItemCount, itemCount }) => (
+                  <tr key={rfq.id} className="border-b border-border transition-colors last:border-0 hover:bg-background/60">
+                    <td className="px-5 py-3 font-medium">
+                      <Link href={`/commercial/rfq/${rfq.id}/market-price`} className="text-secondary hover:underline">
+                        {rfq.rfqNumber}
+                      </Link>
+                    </td>
+                    <td className="px-5 py-3">
+                      <div className="text-text-primary">{rfq.clientName}</div>
+                      <div className="text-text-secondary">{rfq.projectName}</div>
+                    </td>
+                    <td className="px-5 py-3 text-right text-text-secondary">
+                      {pricedItemCount} / {itemCount}
+                    </td>
+                    <td className="px-5 py-3 text-right text-text-secondary">{referenceCount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Panel>
+        </>
       )}
     </div>
   );

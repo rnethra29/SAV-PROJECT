@@ -10,5 +10,5 @@ type PageProps = { params: Promise<{ id: string }> };
 export default async function RfqRevisionsPage({ params }: PageProps) {
   const { id } = await params;
   const [quotationVersions, boqVersions] = await Promise.all([getQuotationVersions(id), getBoqVersions(id)]);
-  return <RfqRevisionsPanel quotationVersions={quotationVersions} boqVersions={boqVersions} />;
+  return <RfqRevisionsPanel rfqId={id} quotationVersions={quotationVersions} boqVersions={boqVersions} />;
 }

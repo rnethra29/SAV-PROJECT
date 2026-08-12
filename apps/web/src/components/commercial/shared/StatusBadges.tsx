@@ -26,7 +26,7 @@ export function EstimationStatusBadge({ status }: { status: EstimationStatus }) 
   return <StatusBadge label={ESTIMATION_LABELS[status]} tone={ESTIMATION_TONE[status]} />;
 }
 
-const QUOTATION_LABELS: Record<QuotationStatus, string> = {
+export const QUOTATION_LABELS: Record<QuotationStatus, string> = {
   draft: "Draft",
   under_approval: "Under Approval",
   approved: "Approved",
@@ -37,7 +37,7 @@ const QUOTATION_LABELS: Record<QuotationStatus, string> = {
   expired: "Expired",
   cancelled: "Cancelled",
 };
-const QUOTATION_TONE: Record<QuotationStatus, StatusTone> = {
+export const QUOTATION_TONE: Record<QuotationStatus, StatusTone> = {
   draft: "inactive",
   under_approval: "warning",
   approved: "secondary",

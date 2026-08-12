@@ -125,8 +125,15 @@ export function RfqListView({ rfqs }: RfqListViewProps) {
             </thead>
             <tbody>
               {visibleRfqs.map((rfq) => (
-                <tr key={rfq.id} className="border-b border-border last:border-0">
-                  <td className="px-5 py-3 font-medium text-text-primary">{rfq.rfqNumber}</td>
+                <tr key={rfq.id} className="border-b border-border transition-colors last:border-0 hover:bg-background/60">
+                  <td className="px-5 py-3 font-medium">
+                    <Link
+                      href={`/commercial/rfq/${rfq.id}`}
+                      className="text-text-primary hover:text-secondary hover:underline"
+                    >
+                      {rfq.rfqNumber}
+                    </Link>
+                  </td>
                   <td className="px-5 py-3">
                     <div className="text-text-primary">{rfq.clientName}</div>
                     <div className="text-text-secondary">{rfq.projectName}</div>

@@ -51,7 +51,7 @@ export function ComparisonTable({ rows }: ComparisonTableProps) {
         </thead>
         <tbody>
           {pricedRows.map((row) => (
-            <tr key={row.rfqItemId} className="border-b border-border last:border-0">
+            <tr key={row.rfqItemId} className="border-b border-border transition-colors last:border-0 hover:bg-background/60">
               <td className="px-4 py-2.5 font-medium text-text-primary">{row.itemCode}</td>
               <td className="max-w-xs px-4 py-2.5 text-text-primary">
                 <span className="line-clamp-2">{row.description}</span>

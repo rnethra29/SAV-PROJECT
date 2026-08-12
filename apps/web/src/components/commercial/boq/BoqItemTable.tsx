@@ -8,10 +8,21 @@ import { formatCurrency, formatNumber } from "@/lib/format";
 import type { Boq } from "@/types/commercial/boq";
 import type { BoqItemNode } from "@/lib/fixtures/boq";
 
-function BoqRow({ node, depth }: { node: BoqItemNode; depth: number }) {
+function BoqRow({
+  node,
+  depth,
+  previousRatesBySourceId,
+}: {
+  node: BoqItemNode;
+  depth: number;
+  previousRatesBySourceId?: Map<string, number>;
+}) {
+  const previousRate = node.sourceRfqItemId ? previousRatesBySourceId?.get(node.sourceRfqItemId) : undefined;
+  const delta = previousRate !== undefined ? node.unitRate - previousRate : null;
+
   return (
     <>
-      <tr className="border-b border-border last:border-0">
+      <tr className="border-b border-border transition-colors last:border-0 hover:bg-background/60">
         <td className="px-4 py-2.5" style={{ paddingLeft: `${1 + depth * 1.25}rem` }}>
           <span className="font-medium text-text-primary">{node.itemCode}</span>
         </td>
@@ -21,10 +32,15 @@ function BoqRow({ node, depth }: { node: BoqItemNode; depth: number }) {
         <td className="px-4 py-2.5 text-text-secondary">{node.unit}</td>
         <td className="px-4 py-2.5 text-right text-text-secondary">{formatNumber(node.quantity, 3)}</td>
         <td className="px-4 py-2.5 text-right text-text-secondary">{formatCurrency(node.unitRate)}</td>
+        {previousRatesBySourceId && (
+          <td className={`px-4 py-2.5 text-right ${delta === null ? "text-text-secondary" : delta < 0 ? "text-success" : delta > 0 ? "text-danger" : "text-text-secondary"}`}>
+            {delta === null ? "New" : delta === 0 ? "—" : formatCurrency(delta)}
+          </td>
+        )}
         <td className="px-4 py-2.5 text-right font-semibold text-text-primary">{formatCurrency(node.amount)}</td>
       </tr>
       {node.children.map((child) => (
-        <BoqRow key={child.id} node={child} depth={depth + 1} />
+        <BoqRow key={child.id} node={child} depth={depth + 1} previousRatesBySourceId={previousRatesBySourceId} />
       ))}
     </>
   );
@@ -36,10 +52,19 @@ type BoqItemTableProps = {
   activeBoq: Boq;
   tree: BoqItemNode[];
   totalAmount: number;
+  previousRatesBySourceId?: Map<string, number>;
 };
 
-export function BoqItemTable({ rfqId, versions, activeBoq, tree, totalAmount }: BoqItemTableProps) {
+export function BoqItemTable({
+  rfqId,
+  versions,
+  activeBoq,
+  tree,
+  totalAmount,
+  previousRatesBySourceId,
+}: BoqItemTableProps) {
   const isLatest = versions[versions.length - 1]?.id === activeBoq.id;
+  const columnCount = previousRatesBySourceId ? 7 : 6;
 
   return (
     <div className="space-y-4">
@@ -101,17 +126,20 @@ export function BoqItemTable({ rfqId, versions, activeBoq, tree, totalAmount }: 
                 <th className="px-4 py-3 font-medium">Unit</th>
                 <th className="px-4 py-3 text-right font-medium">Qty</th>
                 <th className="px-4 py-3 text-right font-medium">Rate</th>
+                {previousRatesBySourceId && (
+                  <th className="px-4 py-3 text-right font-medium">Δ vs Prior Version</th>
+                )}
                 <th className="px-4 py-3 text-right font-medium">Amount</th>
               </tr>
             </thead>
             <tbody>
               {tree.map((node) => (
-                <BoqRow key={node.id} node={node} depth={0} />
+                <BoqRow key={node.id} node={node} depth={0} previousRatesBySourceId={previousRatesBySourceId} />
               ))}
             </tbody>
             <tfoot>
               <tr className="border-t-2 border-border bg-background">
-                <td colSpan={5} className="px-4 py-3 text-right text-sm font-semibold text-text-primary">
+                <td colSpan={columnCount - 1} className="px-4 py-3 text-right text-sm font-semibold text-text-primary">
                   Total
                 </td>
                 <td className="px-4 py-3 text-right text-sm font-semibold text-text-primary">

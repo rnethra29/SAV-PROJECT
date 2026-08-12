@@ -67,7 +67,7 @@ export function EstimationBreakdownTable({ rows }: EstimationBreakdownTableProps
             const item = estimationItem!;
             const total = item.estimatedUnitCost * rfqItem.quantity;
             return (
-              <tr key={rfqItem.id} className="border-b border-border last:border-0">
+              <tr key={rfqItem.id} className="border-b border-border transition-colors last:border-0 hover:bg-background/60">
                 <td className="whitespace-nowrap px-4 py-2.5 font-medium text-text-primary">{rfqItem.itemCode}</td>
                 <td className="max-w-xs px-4 py-2.5 text-text-primary">
                   <span className="line-clamp-2">{rfqItem.description}</span>

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRfqById } from "@/lib/fixtures/rfq";
+import { getCurrentQuotation } from "@/lib/fixtures/quotation";
 import { RfqStatusBadge } from "@/components/commercial/rfq/RfqStatusBadge";
 import { RfqWorkspaceTabs } from "@/components/commercial/rfq/RfqWorkspaceTabs";
 import { ChevronLeftIcon } from "@/components/ui/icons";
@@ -14,7 +15,7 @@ type RfqWorkspaceLayoutProps = {
 
 export default async function RfqWorkspaceLayout({ children, params }: RfqWorkspaceLayoutProps) {
   const { id } = await params;
-  const rfq = await getRfqById(id);
+  const [rfq, quotation] = await Promise.all([getRfqById(id), getCurrentQuotation(id)]);
 
   if (!rfq) {
     notFound();
@@ -30,18 +31,49 @@ export default async function RfqWorkspaceLayout({ children, params }: RfqWorksp
           <ChevronLeftIcon className="h-4 w-4" />
           RFQs
         </Link>
-        <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-xl font-semibold tracking-tight text-text-primary lg:text-2xl">
-              {rfq.rfqNumber}
-            </h1>
-            <RfqStatusBadge status={rfq.status} />
+
+        <div className="mt-2 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-xl font-semibold tracking-tight text-text-primary lg:text-2xl">
+                {rfq.rfqNumber}
+              </h1>
+              <RfqStatusBadge status={rfq.status} />
+            </div>
+            <p className="mt-1 text-sm text-text-secondary">
+              {rfq.clientName} · {rfq.projectName}
+              <span className="text-text-secondary/70"> · RFQ Date {formatDate(rfq.rfqDate)}</span>
+            </p>
           </div>
-          <p className="text-sm text-text-secondary">RFQ Date: {formatDate(rfq.rfqDate)}</p>
+
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              disabled
+              title="RFQ editing — coming soon"
+              className="rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-text-secondary transition disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Edit
+            </button>
+            {quotation ? (
+              <Link
+                href={`/commercial/rfq/${rfq.id}/quotation`}
+                className="rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-text-primary transition hover:border-secondary"
+              >
+                View Quotation
+              </Link>
+            ) : (
+              <button
+                type="button"
+                disabled
+                title="Quotation creation — coming soon"
+                className="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-text-primary transition disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Create Quotation
+              </button>
+            )}
+          </div>
         </div>
-        <p className="mt-1 text-sm text-text-secondary">
-          {rfq.clientName} · {rfq.projectName}
-        </p>
       </div>
 
       <RfqWorkspaceTabs rfqId={rfq.id} />

@@ -3,6 +3,9 @@ import Link from "next/link";
 import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LayersIcon } from "@/components/ui/icons";
+import { MetricCard } from "@/components/dashboard/MetricCard";
+import { PageHeader } from "@/components/commercial/shared/PageHeader";
+import { BarRow } from "@/components/commercial/shared/BarRow";
 import { getRfqList } from "@/lib/fixtures/rfq";
 import { computeRfqAnalysis } from "@/lib/fixtures/analysis";
 import { formatCurrency, formatPercent } from "@/lib/format";
@@ -30,14 +33,17 @@ export default async function ActualVsQuotedOverviewPage() {
     )
   ).filter((row): row is NonNullable<typeof row> => row !== null);
 
+  const totalActual = rows.reduce((sum, r) => sum + r.totalActual, 0);
+  const totalQuoted = rows.reduce((sum, r) => sum + r.totalQuoted, 0);
+  const totalDifference = totalQuoted - totalActual;
+  const maxValue = Math.max(totalActual, totalQuoted, 1);
+
   return (
     <div className="space-y-6 2xl:mx-auto 2xl:max-w-[1600px]">
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight text-text-primary lg:text-2xl">Actual vs Quoted</h1>
-        <p className="mt-1 text-sm text-text-secondary">
-          Variance between actual (internal cost basis) and quoted (client-facing) price, per RFQ.
-        </p>
-      </div>
+      <PageHeader
+        title="Actual vs Quoted"
+        description="Variance between actual (internal cost basis) and quoted (client-facing) price, per RFQ."
+      />
 
       {rows.length === 0 ? (
         <Panel className="bg-surface">
@@ -48,40 +54,62 @@ export default async function ActualVsQuotedOverviewPage() {
           />
         </Panel>
       ) : (
-        <Panel className="bg-surface overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-border text-text-secondary">
-              <tr>
-                <th className="px-5 py-3 font-medium">RFQ</th>
-                <th className="px-5 py-3 font-medium">Client / Project</th>
-                <th className="px-5 py-3 text-right font-medium">Actual Value</th>
-                <th className="px-5 py-3 text-right font-medium">Quoted Value</th>
-                <th className="px-5 py-3 text-right font-medium">Difference</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(({ rfq, totalActual, totalQuoted, totalDifference, differencePct }) => (
-                <tr key={rfq.id} className="border-b border-border last:border-0">
-                  <td className="px-5 py-3 font-medium">
-                    <Link href={`/commercial/rfq/${rfq.id}/comparison`} className="text-secondary hover:underline">
-                      {rfq.rfqNumber}
-                    </Link>
-                  </td>
-                  <td className="px-5 py-3">
-                    <div className="text-text-primary">{rfq.clientName}</div>
-                    <div className="text-text-secondary">{rfq.projectName}</div>
-                  </td>
-                  <td className="px-5 py-3 text-right text-text-secondary">{formatCurrency(totalActual)}</td>
-                  <td className="px-5 py-3 text-right text-text-secondary">{formatCurrency(totalQuoted)}</td>
-                  <td className={`px-5 py-3 text-right font-medium ${totalDifference >= 0 ? "text-success" : "text-danger"}`}>
-                    {formatCurrency(totalDifference)}{" "}
-                    <span className="text-xs">({formatPercent(differencePct)})</span>
-                  </td>
+        <>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <MetricCard label="Total Actual Value" value={totalActual} variant="operational" valueFormatter={formatCurrency} />
+            <MetricCard label="Total Quoted Value" value={totalQuoted} variant="analytics" valueFormatter={formatCurrency} />
+            <MetricCard
+              label="Total Variance"
+              value={totalDifference}
+              variant={totalDifference >= 0 ? "financial" : "neutral"}
+              valueFormatter={formatCurrency}
+            />
+          </div>
+
+          <Panel className="bg-surface p-5">
+            <h2 className="text-sm font-semibold text-text-primary">Actual vs Quoted Value</h2>
+            <p className="mt-0.5 text-xs text-text-secondary">Total internal cost basis vs. total value quoted to clients.</p>
+            <div className="mt-5 space-y-3">
+              <BarRow label="Actual" value={totalActual} max={maxValue} valueLabel={formatCurrency(totalActual)} color="var(--kpi-operational)" />
+              <BarRow label="Quoted" value={totalQuoted} max={maxValue} valueLabel={formatCurrency(totalQuoted)} color="var(--secondary)" />
+            </div>
+          </Panel>
+
+          <Panel className="bg-surface overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-border text-text-secondary">
+                <tr>
+                  <th className="px-5 py-3 font-medium">RFQ</th>
+                  <th className="px-5 py-3 font-medium">Client / Project</th>
+                  <th className="px-5 py-3 text-right font-medium">Actual Value</th>
+                  <th className="px-5 py-3 text-right font-medium">Quoted Value</th>
+                  <th className="px-5 py-3 text-right font-medium">Difference</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </Panel>
+              </thead>
+              <tbody>
+                {rows.map(({ rfq, totalActual, totalQuoted, totalDifference, differencePct }) => (
+                  <tr key={rfq.id} className="border-b border-border transition-colors last:border-0 hover:bg-background/60">
+                    <td className="px-5 py-3 font-medium">
+                      <Link href={`/commercial/rfq/${rfq.id}/comparison`} className="text-secondary hover:underline">
+                        {rfq.rfqNumber}
+                      </Link>
+                    </td>
+                    <td className="px-5 py-3">
+                      <div className="text-text-primary">{rfq.clientName}</div>
+                      <div className="text-text-secondary">{rfq.projectName}</div>
+                    </td>
+                    <td className="px-5 py-3 text-right text-text-secondary">{formatCurrency(totalActual)}</td>
+                    <td className="px-5 py-3 text-right text-text-secondary">{formatCurrency(totalQuoted)}</td>
+                    <td className={`px-5 py-3 text-right font-medium ${totalDifference >= 0 ? "text-success" : "text-danger"}`}>
+                      {formatCurrency(totalDifference)}{" "}
+                      <span className="text-xs">({formatPercent(differencePct)})</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Panel>
+        </>
       )}
     </div>
   );

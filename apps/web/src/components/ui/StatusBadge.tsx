@@ -12,6 +12,18 @@ export const STATUS_TONE_CLASSES: Record<StatusTone, string> = {
   danger: "border-danger/30 bg-danger/10 text-danger",
 };
 
+// Solid-fill equivalent of the tones above, for use as a chart mark color
+// (ProportionBar/BarRow) rather than a badge's tinted border/background.
+export const STATUS_TONE_COLOR: Record<StatusTone, string> = {
+  inactive: "var(--inactive)",
+  info: "var(--info)",
+  warning: "var(--warning)",
+  secondary: "var(--secondary)",
+  primary: "var(--primary)",
+  success: "var(--success)",
+  danger: "var(--danger)",
+};
+
 type StatusBadgeProps = {
   label: string;
   tone: StatusTone;

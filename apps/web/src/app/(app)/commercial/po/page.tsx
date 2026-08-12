@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import { MetricCard } from "@/components/dashboard/MetricCard";
+import { PageHeader } from "@/components/commercial/shared/PageHeader";
 import { getPurchaseOrders } from "@/lib/fixtures/po";
+import { getRfqList } from "@/lib/fixtures/rfq";
 import { PoListTable } from "@/components/commercial/po/PoListTable";
+import { formatCurrency } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "Purchase Orders · SAV ERP",
@@ -8,20 +12,25 @@ export const metadata: Metadata = {
 };
 
 export default async function PoOverviewPage() {
-  const purchaseOrders = await getPurchaseOrders();
+  const [purchaseOrders, rfqs] = await Promise.all([getPurchaseOrders(), getRfqList()]);
+  const rfqNumbersById = new Map(rfqs.map((rfq) => [rfq.id, rfq.rfqNumber]));
+  const totalValue = purchaseOrders.reduce((sum, po) => sum + (po.totalAmount ?? 0), 0);
 
   return (
     <div className="space-y-6 2xl:mx-auto 2xl:max-w-[1600px]">
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight text-text-primary lg:text-2xl">
-          Purchase Orders
-        </h1>
-        <p className="mt-1 text-sm text-text-secondary">
-          POs raised against Final BOQs, traceable back to the settled commercial position.
-        </p>
-      </div>
+      <PageHeader
+        title="Purchase Orders"
+        description="POs raised against Final BOQs, traceable back to the settled commercial position."
+      />
 
-      <PoListTable purchaseOrders={purchaseOrders} />
+      {purchaseOrders.length > 0 && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <MetricCard label="Purchase Orders" value={purchaseOrders.length} variant="neutral" />
+          <MetricCard label="Total PO Value" value={totalValue} variant="financial" valueFormatter={formatCurrency} />
+        </div>
+      )}
+
+      <PoListTable purchaseOrders={purchaseOrders} rfqNumbersById={rfqNumbersById} />
     </div>
   );
 }

@@ -53,7 +53,7 @@ export function DocumentsPanel({ documents, title = "Documents" }: DocumentsPane
             </thead>
             <tbody>
               {documents.map((doc) => (
-                <tr key={doc.id} className="border-b border-border last:border-0">
+                <tr key={doc.id} className="border-b border-border transition-colors last:border-0 hover:bg-background/60">
                   <td className="px-5 py-3">
                     <div className="font-medium text-text-primary">{doc.fileName}</div>
                     {doc.description && <div className="text-text-secondary">{doc.description}</div>}

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LayersIcon } from "@/components/ui/icons";
-import { getBoqVersions, getBoqItemTree } from "@/lib/fixtures/boq";
+import { getBoqVersions, getBoqItemTree, getBoqItems } from "@/lib/fixtures/boq";
 import { BoqItemTable } from "@/components/commercial/boq/BoqItemTable";
 
 export const metadata: Metadata = { title: "BOQ · SAV ERP" };
@@ -31,12 +31,32 @@ export default async function RfqBoqPage({ params, searchParams }: PageProps) {
 
   const requestedVersion = v ? Number(v) : null;
   const activeBoq = versions.find((boq) => boq.versionNo === requestedVersion) ?? versions[versions.length - 1];
-  const tree = await getBoqItemTree(activeBoq.id);
+  const activeIndex = versions.findIndex((boq) => boq.id === activeBoq.id);
+  const previousBoq = activeIndex > 0 ? versions[activeIndex - 1] : null;
+
+  const [tree, previousItems] = await Promise.all([
+    getBoqItemTree(activeBoq.id),
+    previousBoq ? getBoqItems(previousBoq.id) : Promise.resolve(null),
+  ]);
 
   const totalAmount = sumTree(tree);
+  const previousRatesBySourceId = previousItems
+    ? new Map(
+        previousItems
+          .filter((item) => item.sourceRfqItemId)
+          .map((item) => [item.sourceRfqItemId as string, item.unitRate]),
+      )
+    : undefined;
 
   return (
-    <BoqItemTable rfqId={id} versions={versions} activeBoq={activeBoq} tree={tree} totalAmount={totalAmount} />
+    <BoqItemTable
+      rfqId={id}
+      versions={versions}
+      activeBoq={activeBoq}
+      tree={tree}
+      totalAmount={totalAmount}
+      previousRatesBySourceId={previousRatesBySourceId}
+    />
   );
 }
 

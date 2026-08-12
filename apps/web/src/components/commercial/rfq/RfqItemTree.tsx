@@ -9,7 +9,9 @@ function ItemRow({ node, depth }: { node: RfqItemNode; depth: number }) {
   const isHeader = isHeaderRfqItem(node);
   return (
     <>
-      <tr className={`border-b border-border last:border-0 ${isHeader ? "bg-background" : ""}`}>
+      <tr
+        className={`border-b border-border transition-colors last:border-0 ${isHeader ? "bg-background" : "hover:bg-background/60"}`}
+      >
         <td className="px-5 py-2.5" style={{ paddingLeft: `${1.25 + depth * 1.25}rem` }}>
           <span className={isHeader ? "font-semibold text-text-primary" : "font-medium text-text-primary"}>
             {node.itemCode}

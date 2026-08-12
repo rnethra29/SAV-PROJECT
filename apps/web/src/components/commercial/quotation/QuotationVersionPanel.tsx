@@ -99,7 +99,7 @@ export function QuotationVersionPanel({
               const prior = previousItems?.find((p) => p.rfqItemId === item.rfqItemId);
               const delta = prior ? item.quotedRate - prior.quotedRate : null;
               return (
-                <tr key={item.id} className="border-b border-border last:border-0">
+                <tr key={item.id} className="border-b border-border transition-colors last:border-0 hover:bg-background/60">
                   <td className="px-4 py-2.5 font-medium text-text-primary">{item.itemCode}</td>
                   <td className="px-4 py-2.5 text-right text-text-secondary">{item.quantity}</td>
                   <td className="px-4 py-2.5 text-text-secondary">{item.unit}</td>

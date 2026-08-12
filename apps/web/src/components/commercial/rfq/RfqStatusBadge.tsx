@@ -19,7 +19,7 @@ export const RFQ_STATUS_LABELS: Record<RfqStatus, string> = {
 // yet actioned (inactive), received/in-flight (info), active work
 // (warning/secondary/primary), terminal (success/danger/inactive) — keeps
 // the 11-value enum legible at a glance instead of needing 11 hues.
-const STATUS_TONE: Record<RfqStatus, StatusTone> = {
+export const RFQ_STATUS_TONE: Record<RfqStatus, StatusTone> = {
   draft: "inactive",
   received: "info",
   under_review: "warning",
@@ -38,5 +38,5 @@ type RfqStatusBadgeProps = {
 };
 
 export function RfqStatusBadge({ status }: RfqStatusBadgeProps) {
-  return <StatusBadge label={RFQ_STATUS_LABELS[status]} tone={STATUS_TONE[status]} />;
+  return <StatusBadge label={RFQ_STATUS_LABELS[status]} tone={RFQ_STATUS_TONE[status]} />;
 }
