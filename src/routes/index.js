@@ -20,6 +20,16 @@ const auditLogRoutes = require('./auditLog.routes');
 const lookupRoutes = require('./lookup.routes');
 const analysisRoutes = require('./analysis.routes');
 
+// Sites module -> Client Management submodule (clm_*, see
+// SAV_ERP_Client_Management_Module_Architecture.md)
+const clmClientRoutes = require('./clmClient.routes');
+const clmClientContactRoutes = require('./clmClientContact.routes');
+const clmClientRequirementRoutes = require('./clmClientRequirement.routes');
+const clmClientInvoiceRoutes = require('./clmClientInvoice.routes');
+const clmClientInvoiceLineRoutes = require('./clmClientInvoiceLine.routes');
+const clmPaymentRoutes = require('./clmPayment.routes');
+const clmLookupRoutes = require('./clmLookup.routes');
+
 const router = Router();
 
 router.get('/health', (req, res) => res.json({ success: true, message: 'Commercial Lifecycle module API is up', timestamp: new Date().toISOString() }));
@@ -47,5 +57,19 @@ router.use('/analysis', analysisRoutes);
 
 // Lookups
 router.use('/lookups', lookupRoutes);
+
+// ============================================================
+// Sites module -> Client Management submodule
+// Client (+contacts/requirements/invoices/payments nested) -> Client 360.
+// RFQ->PO chain, Documents, Approvals, Audit Log above are reused by FK /
+// entity_type only (architecture doc §2) - not redefined here.
+// ============================================================
+router.use('/clients', clmClientRoutes);
+router.use('/client-contacts', clmClientContactRoutes);
+router.use('/client-requirements', clmClientRequirementRoutes);
+router.use('/client-invoices', clmClientInvoiceRoutes);
+router.use('/invoice-lines', clmClientInvoiceLineRoutes);
+router.use('/client-payments', clmPaymentRoutes);
+router.use('/client-lookups', clmLookupRoutes);
 
 module.exports = router;

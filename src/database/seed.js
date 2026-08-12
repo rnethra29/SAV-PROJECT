@@ -15,6 +15,7 @@
 const { pool, query } = require('../config/database');
 const logger = require('../config/logger');
 const { ITEM_CATEGORIES, PRICE_SOURCE_TYPES, DOCUMENT_CATEGORIES } = require('./seeds/001_lookup_data');
+const { CLIENT_TYPES, INDUSTRIES, CONTACT_TYPES } = require('./seeds/002_client_management_lookup_data');
 
 async function resolveSeedUserId() {
   if (process.env.SEED_USER_ID) return process.env.SEED_USER_ID;
@@ -63,12 +64,36 @@ async function seedDocumentCategories(userId) {
   logger.info(`[seed] com_document_category: ${DOCUMENT_CATEGORIES.length} row(s) ensured`);
 }
 
+async function seedClmClientTypes(userId) {
+  for (const row of CLIENT_TYPES) {
+    await query(`INSERT INTO clm_client_type (type_name, created_by) VALUES ($1, $2) ON CONFLICT (type_name) DO NOTHING`, [row.type_name, userId]);
+  }
+  logger.info(`[seed] clm_client_type: ${CLIENT_TYPES.length} row(s) ensured`);
+}
+
+async function seedClmIndustries(userId) {
+  for (const row of INDUSTRIES) {
+    await query(`INSERT INTO clm_industry (industry_name, created_by) VALUES ($1, $2) ON CONFLICT (industry_name) DO NOTHING`, [row.industry_name, userId]);
+  }
+  logger.info(`[seed] clm_industry: ${INDUSTRIES.length} row(s) ensured`);
+}
+
+async function seedClmContactTypes(userId) {
+  for (const row of CONTACT_TYPES) {
+    await query(`INSERT INTO clm_contact_type (type_name, created_by) VALUES ($1, $2) ON CONFLICT (type_name) DO NOTHING`, [row.type_name, userId]);
+  }
+  logger.info(`[seed] clm_contact_type: ${CONTACT_TYPES.length} row(s) ensured`);
+}
+
 async function main() {
   try {
     const userId = await resolveSeedUserId();
     await seedItemCategories(userId);
     await seedPriceSourceTypes(userId);
     await seedDocumentCategories(userId);
+    await seedClmClientTypes(userId);
+    await seedClmIndustries(userId);
+    await seedClmContactTypes(userId);
     logger.info('[seed] done.');
   } catch (err) {
     logger.error('[seed] failed', { error: err.message });

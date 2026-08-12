@@ -29,11 +29,40 @@ const TABLES = Object.freeze({
   ITEM_CATEGORY: { name: 'com_item_category', pk: 'category_id', pattern: 'LOOKUP' },
   PRICE_SOURCE_TYPE: { name: 'com_price_source_type', pk: 'source_type_id', pattern: 'LOOKUP_MINIMAL' },
   DOCUMENT_CATEGORY: { name: 'com_document_category', pk: 'document_category_id', pattern: 'LOOKUP_MINIMAL' },
+
+  // ---- Sites module -> Client Management submodule (clm_*, architecture
+  // doc SAV_ERP_Client_Management_Module_Architecture.md §5/§9) ----
+  CLM_CLIENT_TYPE: { name: 'clm_client_type', pk: 'client_type_id', pattern: 'LOOKUP_MINIMAL' },
+  CLM_INDUSTRY: { name: 'clm_industry', pk: 'industry_id', pattern: 'LOOKUP_MINIMAL' },
+  CLM_CONTACT_TYPE: { name: 'clm_contact_type', pk: 'contact_type_id', pattern: 'LOOKUP_MINIMAL' },
+  CLM_CLIENT: { name: 'clm_client', pk: 'client_id', pattern: 'CORE' },
+  CLM_CLIENT_CONTACT: { name: 'clm_client_contact', pk: 'contact_id', pattern: 'CORE' },
+  CLM_CLIENT_REQUIREMENT: { name: 'clm_client_requirement', pk: 'requirement_id', pattern: 'CORE' },
+  CLM_CLIENT_INVOICE: { name: 'clm_client_invoice', pk: 'invoice_id', pattern: 'CORE' },
+  CLM_CLIENT_INVOICE_LINE: { name: 'clm_client_invoice_line', pk: 'invoice_line_id', pattern: 'CORE' },
+  CLM_PAYMENT: { name: 'clm_payment', pk: 'payment_id', pattern: 'CORE' },
+  CLM_PAYMENT_ALLOCATION: { name: 'clm_payment_allocation', pk: 'allocation_id', pattern: 'APPEND_ONLY' },
+  CLM_CLIENT_STATUS_HISTORY: { name: 'clm_client_status_history', pk: 'status_history_id', pattern: 'APPEND_ONLY', timeCol: 'changed_at', byCol: 'changed_by' },
 });
 
 const VIEWS = Object.freeze({
   ITEM_COMMERCIAL_ANALYSIS: 'v_item_commercial_analysis',
   ESTIMATION_ITEM_COST: 'v_estimation_item_cost',
+
+  // Client Management submodule views (doc §11/§13)
+  CLIENT_360_OVERVIEW: 'v_client_360_overview',
+  CLIENT_PROJECT_SUMMARY: 'v_client_project_summary',
+  CLIENT_RFQ_HISTORY: 'v_client_rfq_history',
+  CLIENT_BOQ_SUMMARY: 'v_client_boq_summary',
+  CLIENT_PO_SUMMARY: 'v_client_po_summary',
+  CLIENT_BILLING_SUMMARY: 'v_client_billing_summary',
+  CLIENT_PAYMENT_SUMMARY: 'v_client_payment_summary',
+  CLIENT_OUTSTANDING: 'v_client_outstanding',
+  CLIENT_FINANCIAL_SUMMARY: 'v_client_financial_summary',
+  CLIENT_DOCUMENTS: 'v_client_documents',
+  CLIENT_ACTIVITY_HISTORY: 'v_client_activity_history',
+  CLIENT_COST_UTILIZATION: 'v_client_cost_utilization',
+  CLIENT_PROFIT_ANALYSIS: 'v_client_profit_analysis',
 });
 
 module.exports = { TABLES, VIEWS };
