@@ -16,6 +16,11 @@ type RouteNode = {
   label?: string;
   dynamicKey?: DynamicLabelKey;
   children?: Record<string, RouteNode>;
+  // Section-level nodes (e.g. "commercial") are already identified by the
+  // sidebar's active-state highlighting — a breadcrumb crumb for them is
+  // pure noise. `hidden` skips pushing a crumb for this segment while still
+  // descending into its children, so deeper pages keep their real hierarchy.
+  hidden?: boolean;
 };
 
 const RFQ_WORKSPACE_TABS: Record<string, RouteNode> = {
@@ -39,6 +44,7 @@ const ROUTE_TREE: Record<string, RouteNode> = {
   dashboard: { label: "Dashboard" },
   commercial: {
     label: "Commercial",
+    hidden: true,
     children: {
       rfq: {
         label: "RFQ",
@@ -98,15 +104,17 @@ export function buildBreadcrumbTrail(pathname: string): BreadcrumbCrumb[] {
     const node: RouteNode = nodes[key];
     hrefAcc += `/${segment}`;
 
-    if (key === ":id") {
-      crumbs.push({
-        label: fallbackLabelForId(segment),
-        href: hrefAcc,
-        dynamicKey: node.dynamicKey,
-        id: segment,
-      });
-    } else {
-      crumbs.push({ label: node.label ?? segment, href: hrefAcc });
+    if (!node.hidden) {
+      if (key === ":id") {
+        crumbs.push({
+          label: fallbackLabelForId(segment),
+          href: hrefAcc,
+          dynamicKey: node.dynamicKey,
+          id: segment,
+        });
+      } else {
+        crumbs.push({ label: node.label ?? segment, href: hrefAcc });
+      }
     }
 
     nodes = node.children;

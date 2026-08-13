@@ -28,9 +28,14 @@ export function Breadcrumbs() {
     };
   }, [trail]);
 
+  // A single crumb (e.g. just "RFQ" on the RFQ list page) duplicates the
+  // page's own title with no real hierarchy to navigate — the sidebar
+  // already identifies the active section and page. Only render once
+  // there's an actual multi-level trail (e.g. "RFQ / RFQ-2026-0042 / BOQ").
+  if (trail.length < 2) return null;
+
   return (
     <div className="hidden min-w-0 flex-1 items-center gap-1.5 overflow-hidden text-sm text-text-secondary md:flex">
-      <span className="shrink-0 font-medium text-text-primary">SAV Wind Foundations</span>
       {trail.map((crumb, index) => {
         const isCurrent = index === trail.length - 1;
         const label =
@@ -40,7 +45,7 @@ export function Breadcrumbs() {
 
         return (
           <span key={`${crumb.href}-${index}`} className="flex min-w-0 shrink items-center gap-1.5">
-            <span className="shrink-0 text-text-secondary/70">/</span>
+            {index > 0 && <span className="shrink-0 text-text-secondary/70">/</span>}
             {isCurrent ? (
               <span className="truncate font-medium text-text-primary" aria-current="page">
                 {label}
