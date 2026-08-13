@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getRfqById } from "@/lib/fixtures/rfq";
+import { getRfqById, getRfqItems, isHeaderRfqItem } from "@/lib/fixtures/rfq";
 import { getCurrentQuotation } from "@/lib/fixtures/quotation";
 import { RfqStatusBadge } from "@/components/commercial/rfq/RfqStatusBadge";
+import { RfqStatusActions } from "@/components/commercial/rfq/RfqStatusActions";
 import { RfqWorkspaceTabs } from "@/components/commercial/rfq/RfqWorkspaceTabs";
 import { ChevronLeftIcon } from "@/components/ui/icons";
 import { formatDate } from "@/lib/format";
@@ -15,11 +16,13 @@ type RfqWorkspaceLayoutProps = {
 
 export default async function RfqWorkspaceLayout({ children, params }: RfqWorkspaceLayoutProps) {
   const { id } = await params;
-  const [rfq, quotation] = await Promise.all([getRfqById(id), getCurrentQuotation(id)]);
+  const [rfq, quotation, items] = await Promise.all([getRfqById(id), getCurrentQuotation(id), getRfqItems(id)]);
 
   if (!rfq) {
     notFound();
   }
+
+  const hasItems = items.some((item) => !isHeaderRfqItem(item));
 
   return (
     <div className="space-y-4 2xl:mx-auto 2xl:max-w-[1600px]">
@@ -46,15 +49,8 @@ export default async function RfqWorkspaceLayout({ children, params }: RfqWorksp
             </p>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2">
-            <button
-              type="button"
-              disabled
-              title="RFQ editing — coming soon"
-              className="rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-text-secondary transition disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              Edit
-            </button>
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <RfqStatusActions rfq={rfq} hasItems={hasItems} hasQuotation={Boolean(quotation)} />
             {quotation ? (
               <Link
                 href={`/commercial/rfq/${rfq.id}/quotation`}

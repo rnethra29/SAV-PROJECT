@@ -2,14 +2,8 @@ import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { FolderIcon } from "@/components/ui/icons";
 import { DocumentStatusBadge } from "./StatusBadges";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatFileSize } from "@/lib/format";
 import type { CommercialDocument } from "@/types/commercial/shared";
-
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 type DocumentsPanelProps = {
   documents: CommercialDocument[];

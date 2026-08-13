@@ -38,14 +38,13 @@ export default async function BoqOverviewPage() {
         title="Bill of Quantities"
         description="Current BOQ version per RFQ — Tentative or Final."
         actions={
-          <button
-            type="button"
-            disabled
-            title="BOQ creation happens from within the RFQ workspace once negotiation settles"
-            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-text-secondary disabled:cursor-not-allowed disabled:opacity-60"
+          <Link
+            href="/commercial/rfq"
+            title="Open an RFQ's workspace to create a BOQ from it"
+            className="rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-text-primary transition hover:border-secondary"
           >
-            Create BOQ
-          </button>
+            Select RFQ to Create BOQ
+          </Link>
         }
       />
 

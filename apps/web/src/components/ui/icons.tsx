@@ -260,3 +260,102 @@ export function TrendingUpIcon(props: SVGProps<SVGSVGElement>) {
     </IconBase>
   );
 }
+
+export function TrashIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <IconBase {...props}>
+      <path d="M4 6h12" />
+      <path d="M7.5 6V4.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1V6" />
+      <path d="M5.5 6 6.2 16a1 1 0 0 0 1 .9h5.6a1 1 0 0 0 1-.9L14.5 6" />
+      <path d="M8.5 9v5M11.5 9v5" />
+    </IconBase>
+  );
+}
+
+export function PencilIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <IconBase {...props}>
+      <path d="M12.9 3.9 16.1 7.1 6.4 16.8 2.9 17.1 3.2 13.6Z" />
+      <path d="M11 5.8 14.2 9" />
+    </IconBase>
+  );
+}
+
+export function CopyIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <IconBase {...props}>
+      <rect x="7.5" y="7.5" width="9" height="9" rx="1.5" />
+      <path d="M4.5 12.5A1.5 1.5 0 0 1 3 11V4.5A1.5 1.5 0 0 1 4.5 3H11a1.5 1.5 0 0 1 1.5 1.5" />
+    </IconBase>
+  );
+}
+
+export function ArrowUpIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <IconBase {...props}>
+      <path d="M10 15.5v-11M5 9l5-4.5 5 4.5" />
+    </IconBase>
+  );
+}
+
+export function ArrowDownIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <IconBase {...props}>
+      <path d="M10 4.5v11M5 11l5 4.5 5-4.5" />
+    </IconBase>
+  );
+}
+
+export function DownloadIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <IconBase {...props}>
+      <path d="M10 3v10M6 9.5l4 4 4-4" />
+      <path d="M4 15.5v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-1" />
+    </IconBase>
+  );
+}
+
+export function PrinterIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <IconBase {...props}>
+      <path d="M6 7.5V3.5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v4" />
+      <rect x="3" y="7.5" width="14" height="7" rx="1.5" />
+      <path d="M6 13v3.5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V13" />
+    </IconBase>
+  );
+}
+
+export function CheckIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <IconBase {...props}>
+      <path d="M4 10.5 8 14.5 16 6" />
+    </IconBase>
+  );
+}
+
+export function XIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <IconBase {...props}>
+      <path d="M5 5l10 10M15 5 5 15" />
+    </IconBase>
+  );
+}
+
+export function ArrowRightIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <IconBase {...props}>
+      <path d="M4.5 10h11M10.5 5.5 15 10l-4.5 4.5" />
+    </IconBase>
+  );
+}
+
+export function ShareIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <IconBase {...props}>
+      <circle cx="15.5" cy="5" r="2" />
+      <circle cx="4.5" cy="10" r="2" />
+      <circle cx="15.5" cy="15" r="2" />
+      <path d="M6.3 9l7.4-3.1M6.3 11l7.4 3.1" />
+    </IconBase>
+  );
+}

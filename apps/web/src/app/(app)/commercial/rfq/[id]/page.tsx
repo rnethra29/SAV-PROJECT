@@ -11,8 +11,10 @@ import { getEstimationByRfqId } from "@/lib/fixtures/estimation";
 import { getCurrentQuotation } from "@/lib/fixtures/quotation";
 import { getCurrentBoq } from "@/lib/fixtures/boq";
 import { getPurchaseOrdersByRfqId } from "@/lib/fixtures/po";
+import { getAuditLog } from "@/lib/fixtures/audit";
 import { formatCurrency, formatPercent } from "@/lib/format";
 import { EstimationStatusBadge, QuotationStatusBadge, BoqStatusBadge, PoStatusBadge } from "@/components/commercial/shared/StatusBadges";
+import { AuditTrailPanel } from "@/components/commercial/shared/AuditTrailPanel";
 
 export const metadata: Metadata = {
   title: "RFQ Overview · SAV ERP",
@@ -39,14 +41,16 @@ export default async function RfqOverviewPage({ params }: PageProps) {
   const rfq = await getRfqById(id);
   if (!rfq) notFound();
 
-  const [items, profitSummary, estimation, quotation, boq, purchaseOrders] = await Promise.all([
+  const [items, profitSummary, estimation, quotation, boq, purchaseOrders, auditLog] = await Promise.all([
     getRfqItems(id),
     computeRfqProfitSummary(id),
     getEstimationByRfqId(id),
     getCurrentQuotation(id),
     getCurrentBoq(id),
     getPurchaseOrdersByRfqId(id),
+    getAuditLog("rfq", id),
   ]);
+  const statusHistory = auditLog.filter((entry) => entry.action === "status_change");
 
   const lineItemCount = items.filter((item) => !isHeaderRfqItem(item)).length;
 
@@ -167,6 +171,11 @@ export default async function RfqOverviewPage({ params }: PageProps) {
             );
           })}
         </div>
+      </div>
+
+      <div>
+        <h2 className="mb-3 text-sm font-semibold text-text-primary">Status History</h2>
+        <AuditTrailPanel entries={statusHistory} title="RFQ Status Changes" />
       </div>
     </div>
   );

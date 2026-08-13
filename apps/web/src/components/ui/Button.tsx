@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { SpinnerIcon } from "./icons";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "ghost";
+  variant?: "primary" | "ghost" | "danger";
   isLoading?: boolean;
   fullWidth?: boolean;
   children: ReactNode;
@@ -23,6 +23,10 @@ const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
     "active:brightness-90 active:translate-y-0 active:shadow-[0_1px_1px_color-mix(in_srgb,var(--text-primary)_10%,transparent)]",
   ghost:
     "text-secondary hover:text-text-primary hover:underline underline-offset-2 active:brightness-90 px-1 py-1",
+  danger:
+    "bg-danger text-white px-4 py-2.5 " +
+    "shadow-[0_1px_2px_color-mix(in_srgb,var(--text-primary)_10%,transparent)] " +
+    "hover:brightness-95 hover:-translate-y-px active:brightness-90 active:translate-y-0",
 };
 
 export function Button({

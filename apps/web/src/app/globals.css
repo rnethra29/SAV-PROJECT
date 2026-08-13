@@ -88,3 +88,23 @@ body {
 .scrollbar-thin-sidebar::-webkit-scrollbar-thumb:hover {
   background-color: color-mix(in srgb, var(--text-on-sidebar) 40%, transparent);
 }
+
+/*
+ * Print layout for Commercial document previews (BOQ/RFQ/Quotation/PO) —
+ * scoped to `.print-document` so it never affects ordinary screen tables.
+ * AppShell already hides the sidebar/header on print (print:hidden); this
+ * covers paper size/margins and repeating table headers across page breaks,
+ * which Tailwind's print: variant can't express.
+ */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm 12mm;
+  }
+  .print-document table thead {
+    display: table-header-group;
+  }
+  .print-document tr {
+    break-inside: avoid;
+  }
+}

@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { LayersIcon } from "@/components/ui/icons";
+import { Button } from "@/components/ui/Button";
+import { LayersIcon, PrinterIcon, PlusIcon, EyeIcon } from "@/components/ui/icons";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { BoqStatusBadge, BoqTypeBadge } from "@/components/commercial/shared/StatusBadges";
 import { formatCurrency, formatNumber } from "@/lib/format";
@@ -50,6 +53,8 @@ type BoqItemTableProps = {
   rfqId: string;
   versions: Boq[];
   activeBoq: Boq;
+  isLatest?: boolean;
+  poCount?: number;
   tree: BoqItemNode[];
   totalAmount: number;
   previousRatesBySourceId?: Map<string, number>;
@@ -59,17 +64,19 @@ export function BoqItemTable({
   rfqId,
   versions,
   activeBoq,
+  isLatest: isLatestProp,
+  poCount = 0,
   tree,
   totalAmount,
   previousRatesBySourceId,
 }: BoqItemTableProps) {
-  const isLatest = versions[versions.length - 1]?.id === activeBoq.id;
+  const isLatest = isLatestProp ?? versions[versions.length - 1]?.id === activeBoq.id;
   const columnCount = previousRatesBySourceId ? 7 : 6;
 
   return (
-    <div className="space-y-4">
+    <div className="print-document space-y-4">
       {versions.length > 1 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 print:hidden">
           {versions.map((boq) => {
             const isActive = boq.id === activeBoq.id;
             return (
@@ -102,9 +109,37 @@ export function BoqItemTable({
             <p className="mt-1 text-xs text-text-secondary">Reason: {activeBoq.revisionReason}</p>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <BoqTypeBadge type={activeBoq.boqType} />
           <BoqStatusBadge status={activeBoq.status} />
+          <div className="flex flex-wrap items-center gap-2 print:hidden">
+            <Link href={`/commercial/rfq/${rfqId}/boq/document?v=${activeBoq.versionNo}`}>
+              <Button type="button" variant="ghost">
+                <EyeIcon className="h-4 w-4" />
+                Document Preview
+              </Button>
+            </Link>
+            <Button type="button" variant="ghost" onClick={() => window.print()}>
+              <PrinterIcon className="h-4 w-4" />
+              Print
+            </Button>
+            {isLatest && (
+              <Link href={`/commercial/rfq/${rfqId}/boq/new?revise=${activeBoq.id}`}>
+                <Button variant="ghost">
+                  <PlusIcon className="h-4 w-4" />
+                  New Revision
+                </Button>
+              </Link>
+            )}
+            {isLatest && activeBoq.boqType === "final" && poCount === 0 && (
+              <Link href={`/commercial/rfq/${rfqId}/po/new`}>
+                <Button>
+                  <PlusIcon className="h-4 w-4" />
+                  Create PO
+                </Button>
+              </Link>
+            )}
+          </div>
         </div>
       </Panel>
 

@@ -157,14 +157,12 @@ export function RfqListView({ rfqs }: RfqListViewProps) {
                       >
                         View
                       </Link>
-                      <button
-                        type="button"
-                        disabled
-                        title="RFQ editing — coming soon"
-                        className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-text-secondary transition disabled:cursor-not-allowed disabled:opacity-60"
+                      <Link
+                        href={`/commercial/rfq/${rfq.id}/edit`}
+                        className="rounded-lg border border-border px-2.5 py-1.5 text-xs font-medium text-text-secondary transition hover:border-secondary hover:text-text-primary"
                       >
                         Edit
-                      </button>
+                      </Link>
                     </div>
                   </td>
                 </tr>

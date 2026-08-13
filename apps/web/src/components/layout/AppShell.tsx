@@ -21,16 +21,20 @@ export function AppShell({ children }: AppShellProps) {
   // shows a scrollbar when the nav list itself is genuinely taller than
   // the viewport — never as a side effect of the page growing.
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      <Sidebar
-        isCollapsed={isCollapsed}
-        onToggleCollapse={() => setIsCollapsed((value) => !value)}
-        isMobileOpen={isMobileNavOpen}
-        onCloseMobile={() => setIsMobileNavOpen(false)}
-      />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <Header onOpenMobileNav={() => setIsMobileNavOpen(true)} />
-        <main className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-6 lg:px-8 lg:py-8">
+    <div className="flex h-screen overflow-hidden bg-background print:h-auto print:overflow-visible">
+      <div className="print:hidden">
+        <Sidebar
+          isCollapsed={isCollapsed}
+          onToggleCollapse={() => setIsCollapsed((value) => !value)}
+          isMobileOpen={isMobileNavOpen}
+          onCloseMobile={() => setIsMobileNavOpen(false)}
+        />
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col print:block">
+        <div className="print:hidden">
+          <Header onOpenMobileNav={() => setIsMobileNavOpen(true)} />
+        </div>
+        <main className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-6 lg:px-8 lg:py-8 print:overflow-visible print:p-0">
           {children}
         </main>
       </div>

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Panel } from "@/components/ui/Panel";
+import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { EyeIcon } from "@/components/ui/icons";
 import { QuotationStatusBadge } from "@/components/commercial/shared/StatusBadges";
 import { formatCurrency, formatDate } from "@/lib/format";
 import type { Quotation, QuotationItem } from "@/types/commercial/quotation";
@@ -59,7 +61,15 @@ export function QuotationVersionPanel({
               {formatDate(activeVersion.validityDate)}
             </p>
           </div>
-          <QuotationStatusBadge status={activeVersion.status} />
+          <div className="flex items-center gap-2">
+            <QuotationStatusBadge status={activeVersion.status} />
+            <Link href={`/commercial/rfq/${rfqId}/quotation/document?v=${activeVersion.versionNo}`}>
+              <Button type="button" variant="ghost">
+                <EyeIcon className="h-4 w-4" />
+                Document Preview
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Panel } from "@/components/ui/Panel";
-import { ChevronLeftIcon } from "@/components/ui/icons";
+import { Button } from "@/components/ui/Button";
+import { ChevronLeftIcon, EyeIcon } from "@/components/ui/icons";
 import { PoStatusBadge } from "@/components/commercial/shared/StatusBadges";
 import { getPurchaseOrderById, getPoItems } from "@/lib/fixtures/po";
 import { formatCurrency, formatDate } from "@/lib/format";
@@ -20,7 +21,8 @@ export default async function PoDetailPage({ params }: PageProps) {
 
   return (
     <div className="space-y-4 2xl:mx-auto 2xl:max-w-[1600px]">
-      <div>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
         <Link
           href="/commercial/po"
           className="inline-flex items-center gap-1 text-sm font-medium text-secondary hover:underline underline-offset-2"
@@ -35,6 +37,13 @@ export default async function PoDetailPage({ params }: PageProps) {
         <p className="mt-1 text-sm text-text-secondary">
           {po.vendorName} · {formatDate(po.poDate)}
         </p>
+        </div>
+        <Link href={`/commercial/po/${id}/document`}>
+          <Button type="button" variant="ghost">
+            <EyeIcon className="h-4 w-4" />
+            Document Preview
+          </Button>
+        </Link>
       </div>
 
       <Panel className="bg-surface p-5">

@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { LayersIcon } from "@/components/ui/icons";
+import { Button } from "@/components/ui/Button";
+import { LayersIcon, PlusIcon } from "@/components/ui/icons";
 import { getBoqVersions, getBoqItemTree, getBoqItems } from "@/lib/fixtures/boq";
+import { getPurchaseOrdersByBoqId } from "@/lib/fixtures/po";
 import { BoqItemTable } from "@/components/commercial/boq/BoqItemTable";
 
 export const metadata: Metadata = { title: "BOQ · SAV ERP" };
@@ -24,6 +27,14 @@ export default async function RfqBoqPage({ params, searchParams }: PageProps) {
           icon={<LayersIcon className="h-8 w-8" />}
           title="No BOQ yet"
           description="A BOQ is produced once the commercial position is settled through negotiation."
+          action={
+            <Link href={`/commercial/rfq/${id}/boq/new`}>
+              <Button>
+                <PlusIcon className="h-4 w-4" />
+                Create BOQ
+              </Button>
+            </Link>
+          }
         />
       </Panel>
     );
@@ -48,11 +59,16 @@ export default async function RfqBoqPage({ params, searchParams }: PageProps) {
       )
     : undefined;
 
+  const isLatest = versions[versions.length - 1]?.id === activeBoq.id;
+  const purchaseOrders = isLatest ? await getPurchaseOrdersByBoqId(activeBoq.id) : [];
+
   return (
     <BoqItemTable
       rfqId={id}
       versions={versions}
       activeBoq={activeBoq}
+      isLatest={isLatest}
+      poCount={purchaseOrders.length}
       tree={tree}
       totalAmount={totalAmount}
       previousRatesBySourceId={previousRatesBySourceId}
