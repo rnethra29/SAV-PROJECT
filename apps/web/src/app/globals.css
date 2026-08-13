@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+/*
+ * SAV ERP design tokens (Section D of SAV-ERP-PROJECT-CONTEXT.md).
+ * V1 ships light theme only. Values live here so a future dark theme
+ * is a token change, not a component rewrite — components must always
+ * consume these custom properties, never hardcoded colors.
+ */
+:root {
+  /* Base surfaces */
+  --background: #faf7f2;
+  --surface: #ffffff;
+  --sidebar-background: #3b2a1f;
+  --border: #e5e0d8;
+
+  /* Text */
+  --text-primary: #2a2016;
+  --text-secondary: #6b5d4f;
+  --text-on-sidebar: #f3eee4;
+
+  /* Brand accents */
+  --primary: #c8962c;
+  --secondary: #2a8c82;
+
+  /* Universal status colors (state-based, never replaced by brand colors) */
+  --success: #2e7d32;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #2563eb;
+  --inactive: #9ca3af;
+
+  /* KPI card semantic colors (identity-based, independent of status colors) */
+  --kpi-neutral: #f3eee4;
+  --kpi-operational: #3b2a1f;
+  --kpi-analytics: #34746f;
+  --kpi-financial: #c9a66b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-sidebar-background: var(--sidebar-background);
+  --color-border: var(--border);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-on-sidebar: var(--text-on-sidebar);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --color-inactive: var(--inactive);
+  --color-kpi-neutral: var(--kpi-neutral);
+  --color-kpi-operational: var(--kpi-operational);
+  --color-kpi-analytics: var(--kpi-analytics);
+  --color-kpi-financial: var(--kpi-financial);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/*
+ * Thin, subtle scrollbar for the sidebar nav — used only where the nav
+ * list genuinely exceeds the viewport. Deliberately not a global
+ * scrollbar reset; the app shell's one real scroll container (<main>)
+ * keeps the browser's normal scrollbar.
+ */
+.scrollbar-thin-sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--text-on-sidebar) 25%, transparent) transparent;
+}
+.scrollbar-thin-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+.scrollbar-thin-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin-sidebar::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--text-on-sidebar) 25%, transparent);
+  border-radius: 9999px;
+}
+.scrollbar-thin-sidebar::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--text-on-sidebar) 40%, transparent);
+}
+
+/*
+ * Print layout for Commercial document previews (BOQ/RFQ/Quotation/PO) —
+ * scoped to `.print-document` so it never affects ordinary screen tables.
+ * AppShell already hides the sidebar/header on print (print:hidden); this
+ * covers paper size/margins and repeating table headers across page breaks,
+ * which Tailwind's print: variant can't express.
+ */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm 12mm;
+  }
+  .print-document table thead {
+    display: table-header-group;
+  }
+  .print-document tr {
+    break-inside: avoid;
+  }
+}
