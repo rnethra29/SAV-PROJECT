@@ -1,12 +1,13 @@
-# SAV ERP — Commercial Lifecycle Module + Sites: Client Management submodule
+# SAV ERP — Commercial Lifecycle Module + Sites (Client Management + Vendor Management & Procurement)
 
-Backend API for two SAV ERP modules sharing one deployment:
+Backend API for three SAV ERP modules sharing one deployment:
 - **Commercial Lifecycle**: RFQ → Estimation → Market Price Analysis → Actual vs Quoted → Profit Analysis → Quotation → Client Offer/Negotiation → BOQ → Purchase Order (`com_*` tables).
-- **Sites → Client Management** (submodule): Client Master → Contacts → Requirements → (RFQ..PO, reused from Commercial Lifecycle) → Billing/Invoices → Payments → Client 360° (`clm_*` tables).
+- **Sites → Client Management** (submodule): Client Master → Contacts → Requirements → (RFQ..PO, reused from Commercial Lifecycle) → Billing/Invoices → Payments → Client 360° (`clm_client*`/`clm_payment*` tables).
+- **Sites → Vendor Management & Procurement** (submodule): Project (the hub) → Cost Plan → [Vendor → Materials/Services → Procurement PO → Vendor Invoice → Vendor Payment] → Project Expense → Project Financial Summary, plus RBAC (`clm_project*`, `vnd_*`, `sec_*` tables).
 
-Implements the schema and business rules from [`SAV_ERP_Commercial_Lifecycle_Module_Architecture.md`](SAV_ERP_Commercial_Lifecycle_Module_Architecture.md) and [`SAV_ERP_Client_Management_Module_Architecture.md`](SAV_ERP_Client_Management_Module_Architecture.md). Node.js/Express + PostgreSQL (Supabase) via `pg`; Supabase Storage for documents; Supabase Auth (JWKS-verified) for authentication.
+Implements the schema and business rules from [`SAV_ERP_Commercial_Lifecycle_Module_Architecture.md`](SAV_ERP_Commercial_Lifecycle_Module_Architecture.md), [`SAV_ERP_Client_Management_Module_Architecture.md`](SAV_ERP_Client_Management_Module_Architecture.md), and [`SAV_ERP_Sites_Vendor_Procurement_Module_Architecture.md`](SAV_ERP_Sites_Vendor_Procurement_Module_Architecture.md). Node.js/Express + PostgreSQL (Supabase) via `pg`; Supabase Storage for documents; Supabase Auth (JWKS-verified) for authentication.
 
-Client Management deliberately does **not** duplicate RFQ/Estimation/Quotation/Negotiation/BOQ/PO, Documents, Approvals, or Audit Log — it references the Commercial Lifecycle module's tables by FK and extends `com_documents`/`com_approvals` with new `entity_type` values instead of creating parallel tables. See the architecture doc's escalation notes (top of file) for the two open items before this goes fully live: reconciling `clm_client` against the separate Module 04 client spec, and the `com_rfq.client_id`/`com_boq.client_id` FK-target reconciliation.
+Both Sites submodules deliberately avoid duplicating existing ground: Client Management references the Commercial Lifecycle module's tables by FK; Vendor Management & Procurement references *both* prior modules and introduces its own **`vnd_purchase_order`** (direct material/service procurement) as a deliberately separate table from `com_po` (the Commercial Lifecycle module's subcontract/work-package PO) — see that doc's §0 reconciliation table for why. All three modules extend the same shared `com_documents`/`com_approvals`/`com_audit_log` engines with new `entity_type`/`action` values instead of creating parallel tables. See each doc's own escalation notes for open items before going fully live (client-master reconciliation against Module 04, the `com_rfq.client_id`/`com_boq.client_id` FK-target reconciliation, and whether `com_po`/`vnd_purchase_order` should ever be merged).
 
 ## Quick start
 
@@ -38,10 +39,12 @@ src/
   tests/        unit tests (node:test) for pure business-rule logic
 ```
 
-Layered by concern (not by feature) to match this project's existing scaffold. Every module (RFQ, Estimation, Market/Actual Price, Quotation, Negotiation, BOQ, PO, Documents, Approvals, Audit Log, Analysis, and the `clm*`-prefixed Client Management files) follows the same repository → service → controller → route shape.
+Layered by concern (not by feature) to match this project's existing scaffold. Every module (RFQ, Estimation, Market/Actual Price, Quotation, Negotiation, BOQ, PO, Documents, Approvals, Audit Log, Analysis, the `clm*`-prefixed Client Management files, and the `clmProject*`/`vnd*`/`secRbac`-prefixed Vendor Management & Procurement files) follows the same repository → service → controller → route shape.
 
 ## External dependencies
 
-This module deliberately does **not** create `companies`, `branches`, `users`, `employees`, `clients`, `projects`, `sites`, `vendors`, `currencies`, or `taxes` — those belong to other SAV ERP modules and are referenced here by FK only. `npm run migrate` will stop at the first table that FKs to one of them until that module exists; re-running it later picks up right where it left off.
+This module deliberately does **not** create `companies`, `branches`, `users`, `employees`, `clients`, `sites`, `currencies`, or `taxes` — those belong to other SAV ERP modules and are referenced here by FK only. `npm run migrate` will stop at the first table that FKs to one of them until that module exists; re-running it later picks up right where it left off. (`vendors` and `projects` *are* created here now, as `vnd_vendor` and `clm_project` — see below.)
 
 `clm_client` (Client Management) is intentionally a separate table from the external `clients` table that `com_rfq`/`com_boq` already FK to — see the escalation notes at the top of `SAV_ERP_Client_Management_Module_Architecture.md` for the reconciliation this implies before the two are unified.
+
+`vnd_vendor` (Vendor Management & Procurement) is intended to *become* the same physical table `com_po.vendor_id` already assumes as an external `vendors` table (per that doc's §0 reconciliation) — confirm/rename before going live. Likewise `clm_project` fills the "external, assumed" `projects` gap both prior docs left open, but `com_rfq.project_id`/`com_boq.project_id`/`com_po.project_id` still target the external `projects(id)` table as-is (see `004_rfq_tables.sql`) — the same unreconciled-FK-target pattern as `clients`/`clm_client`, called out again in `clm_project`'s own migration comments. Once reconciled, `clm_project` becomes the hub every financial fact in the whole deployment hangs off (`clm_client_invoice`/`vnd_purchase_order`/`vnd_vendor_invoice`/`clm_project_expense` already carry a `project_id` pointing at it today).

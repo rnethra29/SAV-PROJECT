@@ -13,6 +13,12 @@ const {
   CLM_REQUIREMENT_TRANSITIONS,
   CLM_INVOICE_TRANSITIONS,
   CLM_PAYMENT_VERIFICATION_TRANSITIONS,
+  CLM_PROJECT_TRANSITIONS,
+  VND_VENDOR_TRANSITIONS,
+  VND_PO_TRANSITIONS,
+  VND_PO_APPROVAL_STATUS_TRANSITIONS,
+  VND_INVOICE_TRANSITIONS,
+  VND_PAYMENT_TRANSITIONS,
   isValidTransition,
 } = require('../models/statusTransitions');
 
@@ -130,5 +136,64 @@ describe('Client Management submodule status machines (Sites module)', () => {
     assert.equal(isValidTransition(CLM_PAYMENT_VERIFICATION_TRANSITIONS, 'Pending', 'Rejected'), true);
     assert.deepEqual(CLM_PAYMENT_VERIFICATION_TRANSITIONS.Verified, []);
     assert.deepEqual(CLM_PAYMENT_VERIFICATION_TRANSITIONS.Rejected, []);
+  });
+});
+
+describe('Vendor Management & Procurement submodule status machines (Sites module)', () => {
+  test('project: happy path Planning -> Estimation -> Approved -> In Progress -> On Hold -> In Progress -> Completed', () => {
+    const path = ['Planning', 'Estimation', 'Approved', 'In Progress', 'On Hold', 'In Progress', 'Completed'];
+    for (let i = 0; i < path.length - 1; i++) {
+      assert.equal(isValidTransition(CLM_PROJECT_TRANSITIONS, path[i], path[i + 1]), true, `${path[i]} -> ${path[i + 1]}`);
+    }
+    assert.deepEqual(CLM_PROJECT_TRANSITIONS.Completed, []);
+  });
+
+  test('project: cannot skip straight from Planning to In Progress', () => {
+    assert.equal(isValidTransition(CLM_PROJECT_TRANSITIONS, 'Planning', 'In Progress'), false);
+  });
+
+  test('vendor: Active <-> Inactive/Under Review round trips; Blacklisted is terminal', () => {
+    assert.equal(isValidTransition(VND_VENDOR_TRANSITIONS, 'Active', 'Under Review'), true);
+    assert.equal(isValidTransition(VND_VENDOR_TRANSITIONS, 'Under Review', 'Active'), true);
+    assert.equal(isValidTransition(VND_VENDOR_TRANSITIONS, 'Inactive', 'Active'), true);
+    assert.deepEqual(VND_VENDOR_TRANSITIONS.Blacklisted, []);
+  });
+
+  test('procurement PO: happy path Draft -> Pending Approval -> Approved -> Sent to Vendor -> Partially Received -> Received -> Closed', () => {
+    const path = ['Draft', 'Pending Approval', 'Approved', 'Sent to Vendor', 'Partially Received', 'Received', 'Closed'];
+    for (let i = 0; i < path.length - 1; i++) {
+      assert.equal(isValidTransition(VND_PO_TRANSITIONS, path[i], path[i + 1]), true, `${path[i]} -> ${path[i + 1]}`);
+    }
+    assert.deepEqual(VND_PO_TRANSITIONS.Closed, []);
+  });
+
+  test('procurement PO: cannot skip straight from Draft to Approved', () => {
+    assert.equal(isValidTransition(VND_PO_TRANSITIONS, 'Draft', 'Approved'), false);
+  });
+
+  test('procurement PO approval_status: Manager stage must precede Finance stage', () => {
+    assert.equal(isValidTransition(VND_PO_APPROVAL_STATUS_TRANSITIONS, 'Pending', 'Manager Approved'), true);
+    assert.equal(isValidTransition(VND_PO_APPROVAL_STATUS_TRANSITIONS, 'Manager Approved', 'Finance Approved'), true);
+    assert.equal(isValidTransition(VND_PO_APPROVAL_STATUS_TRANSITIONS, 'Pending', 'Finance Approved'), false);
+    assert.deepEqual(VND_PO_APPROVAL_STATUS_TRANSITIONS['Finance Approved'], []);
+  });
+
+  test('vendor invoice: happy path Draft -> Submitted -> Verified -> Approved -> Paid', () => {
+    const path = ['Draft', 'Submitted', 'Verified', 'Approved', 'Paid'];
+    for (let i = 0; i < path.length - 1; i++) {
+      assert.equal(isValidTransition(VND_INVOICE_TRANSITIONS, path[i], path[i + 1]), true, `${path[i]} -> ${path[i + 1]}`);
+    }
+    assert.deepEqual(VND_INVOICE_TRANSITIONS.Paid, []);
+  });
+
+  test('vendor invoice: a Disputed invoice can be resubmitted', () => {
+    assert.equal(isValidTransition(VND_INVOICE_TRANSITIONS, 'Disputed', 'Submitted'), true);
+  });
+
+  test('vendor payment: Pending -> Processed -> Reversed is valid; a Failed payment can retry to Pending', () => {
+    assert.equal(isValidTransition(VND_PAYMENT_TRANSITIONS, 'Pending', 'Processed'), true);
+    assert.equal(isValidTransition(VND_PAYMENT_TRANSITIONS, 'Processed', 'Reversed'), true);
+    assert.equal(isValidTransition(VND_PAYMENT_TRANSITIONS, 'Failed', 'Pending'), true);
+    assert.deepEqual(VND_PAYMENT_TRANSITIONS.Reversed, []);
   });
 });
