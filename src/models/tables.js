@@ -43,6 +43,31 @@ const TABLES = Object.freeze({
   CLM_PAYMENT: { name: 'clm_payment', pk: 'payment_id', pattern: 'CORE' },
   CLM_PAYMENT_ALLOCATION: { name: 'clm_payment_allocation', pk: 'allocation_id', pattern: 'APPEND_ONLY' },
   CLM_CLIENT_STATUS_HISTORY: { name: 'clm_client_status_history', pk: 'status_history_id', pattern: 'APPEND_ONLY', timeCol: 'changed_at', byCol: 'changed_by' },
+
+  // ---- Sites module -> Vendor Management & Procurement submodule (vnd_*)
+  // + Client Management extension (clm_project*) + RBAC (sec_*), architecture
+  // doc SAV_ERP_Sites_Vendor_Procurement_Module_Architecture.md §6 ----
+  CLM_PROJECT: { name: 'clm_project', pk: 'project_id', pattern: 'CORE' },
+  CLM_PROJECT_COST: { name: 'clm_project_cost', pk: 'project_cost_id', pattern: 'CORE_NO_SOFT_DELETE' },
+  CLM_PROJECT_EXPENSE: { name: 'clm_project_expense', pk: 'expense_id', pattern: 'CORE' },
+  VND_VENDOR_TYPE: { name: 'vnd_vendor_type', pk: 'vendor_type_id', pattern: 'LOOKUP_MINIMAL' },
+  VND_MATERIAL_CATEGORY: { name: 'vnd_material_category', pk: 'material_category_id', pattern: 'LOOKUP_MINIMAL' },
+  VND_VENDOR: { name: 'vnd_vendor', pk: 'vendor_id', pattern: 'CORE' },
+  VND_VENDOR_CONTACT: { name: 'vnd_vendor_contact', pk: 'vendor_contact_id', pattern: 'CORE' },
+  VND_VENDOR_BANK_ACCOUNT: { name: 'vnd_vendor_bank_account', pk: 'bank_account_id', pattern: 'CORE' },
+  VND_MATERIAL_SERVICE: { name: 'vnd_material_service', pk: 'material_service_id', pattern: 'CORE_NO_SOFT_DELETE' },
+  VND_VENDOR_RATING: { name: 'vnd_vendor_rating', pk: 'rating_id', pattern: 'APPEND_ONLY', timeCol: 'rated_at', byCol: 'rated_by' },
+  VND_PURCHASE_ORDER: { name: 'vnd_purchase_order', pk: 'po_id', pattern: 'CORE' },
+  VND_PURCHASE_ORDER_ITEM: { name: 'vnd_purchase_order_item', pk: 'po_item_id', pattern: 'CORE_NO_SOFT_DELETE' },
+  VND_VENDOR_INVOICE: { name: 'vnd_vendor_invoice', pk: 'vendor_invoice_id', pattern: 'CORE' },
+  // No company_id/branch_id/audit columns at all (doc §6.14) - a bare child row, scoped entirely through its parent vnd_vendor_invoice.
+  VND_VENDOR_INVOICE_ITEM: { name: 'vnd_vendor_invoice_item', pk: 'vendor_invoice_item_id', pattern: 'MINIMAL_CHILD' },
+  VND_VENDOR_PAYMENT: { name: 'vnd_vendor_payment', pk: 'vendor_payment_id', pattern: 'CORE_NO_SOFT_DELETE' },
+  VND_VENDOR_PAYMENT_ALLOCATION: { name: 'vnd_vendor_payment_allocation', pk: 'allocation_id', pattern: 'APPEND_ONLY' },
+  SEC_ROLE: { name: 'sec_role', pk: 'role_id', pattern: 'LOOKUP_MINIMAL' },
+  SEC_PERMISSION: { name: 'sec_permission', pk: 'permission_id', pattern: 'LOOKUP_MINIMAL' },
+  SEC_ROLE_PERMISSION: { name: 'sec_role_permission', pk: 'role_permission_id', pattern: 'APPEND_ONLY' },
+  SEC_USER_ROLE: { name: 'sec_user_role', pk: 'user_role_id', pattern: 'APPEND_ONLY', timeCol: 'assigned_at', byCol: 'assigned_by' },
 });
 
 const VIEWS = Object.freeze({
@@ -63,6 +88,14 @@ const VIEWS = Object.freeze({
   CLIENT_ACTIVITY_HISTORY: 'v_client_activity_history',
   CLIENT_COST_UTILIZATION: 'v_client_cost_utilization',
   CLIENT_PROFIT_ANALYSIS: 'v_client_profit_analysis',
+
+  // Vendor Management & Procurement submodule views (doc §6.17/§6.18)
+  VENDOR_PERFORMANCE: 'v_vendor_performance',
+  VENDOR_PO_SUMMARY: 'v_vendor_po_summary',
+  VENDOR_INVOICE_SUMMARY: 'v_vendor_invoice_summary',
+  VENDOR_FINANCIAL_SUMMARY: 'v_vendor_financial_summary',
+  PROJECT_COST_SUMMARY: 'v_project_cost_summary',
+  PROJECT_FINANCIAL_SUMMARY: 'v_project_financial_summary',
 });
 
 module.exports = { TABLES, VIEWS };

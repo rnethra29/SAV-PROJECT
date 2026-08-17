@@ -25,6 +25,14 @@ const APPROVAL_STAGES = Object.freeze({
   // "only Approver roles can transition clm_client_invoice.status from
   // Submitted -> Approved".
   CLIENT_INVOICE: 'Client Invoice Approval',
+  // Vendor Management & Procurement submodule (Sites module) gates: doc §13
+  // - Procurement PO is a two-stage chain (Manager then Finance) before it
+  // may be marked 'Approved'; Vendor Invoice has a single 'Approved' gate
+  // (its 'Verified' checkpoint is a plain column, not a com_approvals stage
+  // - see doc §13's explicit reasoning).
+  PROCUREMENT_PO_MANAGER: 'Manager Approval',
+  PROCUREMENT_PO_FINANCE: 'Finance Approval',
+  VENDOR_INVOICE: 'Vendor Invoice Approval',
 });
 
 module.exports = { APPROVAL_STAGES };

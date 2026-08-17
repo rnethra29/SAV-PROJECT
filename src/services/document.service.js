@@ -24,6 +24,13 @@ const ENTITY_TABLE_MAP = {
   ClientRequirement: { table: 'clm_client_requirement', pk: 'requirement_id' },
   ClientInvoice: { table: 'clm_client_invoice', pk: 'invoice_id' },
   ClientPayment: { table: 'clm_payment', pk: 'payment_id' },
+  // Sites module -> Vendor Management & Procurement submodule (com_documents extended, not duplicated - doc §12)
+  Project: { table: 'clm_project', pk: 'project_id' },
+  Vendor: { table: 'vnd_vendor', pk: 'vendor_id' },
+  VendorContact: { table: 'vnd_vendor_contact', pk: 'vendor_contact_id' },
+  ProcurementPO: { table: 'vnd_purchase_order', pk: 'po_id' },
+  VendorInvoice: { table: 'vnd_vendor_invoice', pk: 'vendor_invoice_id' },
+  VendorPayment: { table: 'vnd_vendor_payment', pk: 'vendor_payment_id' },
 };
 
 async function assertEntityExists(entityType, entityId, companyId) {
