@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Panel } from "@/components/ui/Panel";
 import { MetricCard } from "@/components/dashboard/MetricCard";
-import { PageHeader } from "@/components/commercial/shared/PageHeader";
-import { ProportionBar } from "@/components/commercial/shared/ProportionBar";
-import { BarRow } from "@/components/commercial/shared/BarRow";
-import { RFQ_STATUS_LABELS, RFQ_STATUS_TONE } from "@/components/commercial/rfq/RfqStatusBadge";
+import { PageHeader } from "@/modules/commercial-lifecycle/components/shared/PageHeader";
+import { ProportionBar } from "@/modules/commercial-lifecycle/components/shared/ProportionBar";
+import { BarRow } from "@/modules/commercial-lifecycle/components/shared/BarRow";
+import { RFQ_STATUS_LABELS, RFQ_STATUS_TONE } from "@/modules/commercial-lifecycle/components/rfq/RfqStatusBadge";
 import { STATUS_TONE_COLOR } from "@/components/ui/StatusBadge";
-import { computeModuleOverview, computeRfqProfitSummary } from "@/lib/fixtures/analysis";
-import { getRfqList } from "@/lib/fixtures/rfq";
+import { computeModuleOverview, computeRfqProfitSummary } from "@/modules/commercial-lifecycle/fixtures/analysis";
+import { getRfqList } from "@/modules/commercial-lifecycle/fixtures/rfq";
 import { formatCurrency, formatPercent } from "@/lib/format";
-import type { RfqStatus } from "@/types/commercial/rfq";
+import type { RfqStatus } from "@/modules/commercial-lifecycle/types/rfq";
 
 export const metadata: Metadata = {
   title: "Commercial Lifecycle · SAV ERP",

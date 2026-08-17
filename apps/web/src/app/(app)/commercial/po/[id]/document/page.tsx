@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeftIcon } from "@/components/ui/icons";
-import { getPurchaseOrderById, getPoItems } from "@/lib/fixtures/po";
-import { getRfqById } from "@/lib/fixtures/rfq";
-import { getBoqById } from "@/lib/fixtures/boq";
-import { getProjectOptions, getSiteOptions } from "@/lib/fixtures/commercial-references";
-import { PoDocumentPreview, type PoPreviewLine } from "@/components/commercial/po/PoDocumentPreview";
-import { DocumentActionBar } from "@/components/commercial/shared/DocumentActionBar";
+import { getPurchaseOrderById, getPoItems } from "@/modules/commercial-lifecycle/fixtures/po";
+import { getRfqById } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { getBoqById } from "@/modules/commercial-lifecycle/fixtures/boq";
+import { getProjectOptions, getSiteOptions } from "@/modules/commercial-lifecycle/fixtures/commercial-references";
+import { PoDocumentPreview, type PoPreviewLine } from "@/modules/commercial-lifecycle/components/po/PoDocumentPreview";
+import { DocumentActionBar } from "@/modules/commercial-lifecycle/components/shared/DocumentActionBar";
 
 export const metadata: Metadata = { title: "PO Document · SAV ERP" };
 

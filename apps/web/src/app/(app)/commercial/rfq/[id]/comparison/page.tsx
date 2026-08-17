@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { computeRfqAnalysis } from "@/lib/fixtures/analysis";
-import { ComparisonTable } from "@/components/commercial/comparison/ComparisonTable";
+import { computeRfqAnalysis } from "@/modules/commercial-lifecycle/fixtures/analysis";
+import { ComparisonTable } from "@/modules/commercial-lifecycle/components/comparison/ComparisonTable";
 
 export const metadata: Metadata = { title: "Actual vs Quoted · SAV ERP" };
 

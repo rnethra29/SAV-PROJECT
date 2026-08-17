@@ -1,4 +1,4 @@
-import { TabSkeleton } from "@/components/commercial/shared/TabSkeleton";
+import { TabSkeleton } from "@/modules/commercial-lifecycle/components/shared/TabSkeleton";
 
 export default function Loading() {
   return <TabSkeleton />;

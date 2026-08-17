@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { getCurrentQuotation, getQuotationItems } from "@/lib/fixtures/quotation";
-import { getNegotiationOffersByQuotationItem } from "@/lib/fixtures/negotiation";
-import { getRfqItemById } from "@/lib/fixtures/rfq";
-import { NegotiationTimeline } from "@/components/commercial/negotiation/NegotiationTimeline";
+import { getCurrentQuotation, getQuotationItems } from "@/modules/commercial-lifecycle/fixtures/quotation";
+import { getNegotiationOffersByQuotationItem } from "@/modules/commercial-lifecycle/fixtures/negotiation";
+import { getRfqItemById } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { NegotiationTimeline } from "@/modules/commercial-lifecycle/components/negotiation/NegotiationTimeline";
 import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { UsersIcon } from "@/components/ui/icons";

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { getQuotationVersions } from "@/lib/fixtures/quotation";
-import { getBoqVersions } from "@/lib/fixtures/boq";
-import { RfqRevisionsPanel } from "@/components/commercial/rfq/RfqRevisionsPanel";
+import { getQuotationVersions } from "@/modules/commercial-lifecycle/fixtures/quotation";
+import { getBoqVersions } from "@/modules/commercial-lifecycle/fixtures/boq";
+import { RfqRevisionsPanel } from "@/modules/commercial-lifecycle/components/rfq/RfqRevisionsPanel";
 
 export const metadata: Metadata = { title: "RFQ Revisions · SAV ERP" };
 

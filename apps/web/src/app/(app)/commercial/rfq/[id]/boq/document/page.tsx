@@ -5,12 +5,12 @@ import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
 import { ChevronLeftIcon, LayersIcon } from "@/components/ui/icons";
-import { getRfqById } from "@/lib/fixtures/rfq";
-import { getSiteOptions } from "@/lib/fixtures/commercial-references";
-import { getBoqVersions, getBoqItemTree } from "@/lib/fixtures/boq";
-import { flattenBoqTree } from "@/lib/commercial/boq-generation";
-import { BoqDocumentPreview } from "@/components/commercial/boq/BoqDocumentPreview";
-import { DocumentActionBar } from "@/components/commercial/shared/DocumentActionBar";
+import { getRfqById } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { getSiteOptions } from "@/modules/commercial-lifecycle/fixtures/commercial-references";
+import { getBoqVersions, getBoqItemTree } from "@/modules/commercial-lifecycle/fixtures/boq";
+import { flattenBoqTree } from "@/modules/commercial-lifecycle/lib/boq-generation";
+import { BoqDocumentPreview } from "@/modules/commercial-lifecycle/components/boq/BoqDocumentPreview";
+import { DocumentActionBar } from "@/modules/commercial-lifecycle/components/shared/DocumentActionBar";
 
 export const metadata: Metadata = { title: "BOQ Document · SAV ERP" };
 

@@ -1,5 +1,5 @@
-import { getRfqById } from "@/lib/fixtures/rfq";
-import { getPurchaseOrderById } from "@/lib/fixtures/po";
+import { getRfqById } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { getPurchaseOrderById } from "@/modules/commercial-lifecycle/fixtures/po";
 
 /**
  * Centralized, route-aware breadcrumb source of truth. Add a route here

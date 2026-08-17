@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { getEstimationByRfqId } from "@/lib/fixtures/estimation";
-import { getQuotationVersions } from "@/lib/fixtures/quotation";
-import { getBoqVersions } from "@/lib/fixtures/boq";
-import { getPurchaseOrdersByRfqId } from "@/lib/fixtures/po";
-import { getAuditLogForRfq } from "@/lib/fixtures/audit";
-import { AuditTrailPanel } from "@/components/commercial/shared/AuditTrailPanel";
+import { getEstimationByRfqId } from "@/modules/commercial-lifecycle/fixtures/estimation";
+import { getQuotationVersions } from "@/modules/commercial-lifecycle/fixtures/quotation";
+import { getBoqVersions } from "@/modules/commercial-lifecycle/fixtures/boq";
+import { getPurchaseOrdersByRfqId } from "@/modules/commercial-lifecycle/fixtures/po";
+import { getAuditLogForRfq } from "@/modules/commercial-lifecycle/fixtures/audit";
+import { AuditTrailPanel } from "@/modules/commercial-lifecycle/components/shared/AuditTrailPanel";
 
 export const metadata: Metadata = { title: "RFQ Audit Trail · SAV ERP" };
 

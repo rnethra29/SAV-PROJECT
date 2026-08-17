@@ -4,11 +4,11 @@ import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LayersIcon } from "@/components/ui/icons";
 import { MetricCard } from "@/components/dashboard/MetricCard";
-import { PageHeader } from "@/components/commercial/shared/PageHeader";
-import { getRfqList } from "@/lib/fixtures/rfq";
-import { getEstimationByRfqId } from "@/lib/fixtures/estimation";
-import { computeRfqProfitSummary } from "@/lib/fixtures/analysis";
-import { EstimationStatusBadge } from "@/components/commercial/shared/StatusBadges";
+import { PageHeader } from "@/modules/commercial-lifecycle/components/shared/PageHeader";
+import { getRfqList } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { getEstimationByRfqId } from "@/modules/commercial-lifecycle/fixtures/estimation";
+import { computeRfqProfitSummary } from "@/modules/commercial-lifecycle/fixtures/analysis";
+import { EstimationStatusBadge } from "@/modules/commercial-lifecycle/components/shared/StatusBadges";
 import { formatCurrency, formatDate } from "@/lib/format";
 
 export const metadata: Metadata = {

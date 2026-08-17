@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { InboxIcon } from "@/components/ui/icons";
-import { getQuotationVersions, getQuotationItems } from "@/lib/fixtures/quotation";
-import { QuotationVersionPanel } from "@/components/commercial/quotation/QuotationVersionPanel";
+import { getQuotationVersions, getQuotationItems } from "@/modules/commercial-lifecycle/fixtures/quotation";
+import { QuotationVersionPanel } from "@/modules/commercial-lifecycle/components/quotation/QuotationVersionPanel";
 
 export const metadata: Metadata = { title: "Quotation · SAV ERP" };
 

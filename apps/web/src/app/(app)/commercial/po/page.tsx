@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { MetricCard } from "@/components/dashboard/MetricCard";
-import { PageHeader } from "@/components/commercial/shared/PageHeader";
-import { getPurchaseOrders } from "@/lib/fixtures/po";
-import { getRfqList } from "@/lib/fixtures/rfq";
-import { PoListTable } from "@/components/commercial/po/PoListTable";
+import { PageHeader } from "@/modules/commercial-lifecycle/components/shared/PageHeader";
+import { getPurchaseOrders } from "@/modules/commercial-lifecycle/fixtures/po";
+import { getRfqList } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { PoListTable } from "@/modules/commercial-lifecycle/components/po/PoListTable";
 import { formatCurrency } from "@/lib/format";
 
 export const metadata: Metadata = {

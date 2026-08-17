@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { RfqFormWizard } from "@/components/commercial/rfq/RfqFormWizard";
-import { getClientOptions, getProjectOptions, getSiteOptions } from "@/lib/fixtures/commercial-references";
-import { getItemCategoryOptions } from "@/lib/fixtures/item-categories";
+import { RfqFormWizard } from "@/modules/commercial-lifecycle/components/rfq/RfqFormWizard";
+import { getClientOptions, getProjectOptions, getSiteOptions } from "@/modules/commercial-lifecycle/fixtures/commercial-references";
+import { getItemCategoryOptions } from "@/modules/commercial-lifecycle/fixtures/item-categories";
 
 export const metadata: Metadata = {
   title: "New RFQ · SAV ERP",

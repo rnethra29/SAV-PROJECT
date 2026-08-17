@@ -5,12 +5,12 @@ import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
 import { ChevronLeftIcon, LayersIcon } from "@/components/ui/icons";
-import { getRfqById } from "@/lib/fixtures/rfq";
-import { getSiteOptions, getVendorOptions } from "@/lib/fixtures/commercial-references";
-import { getCurrentBoq } from "@/lib/fixtures/boq";
-import { getPurchaseOrdersByBoqId } from "@/lib/fixtures/po";
-import { buildPoDraftFromBoq } from "@/lib/commercial/po-generation";
-import { PoCreateWizard } from "@/components/commercial/po/PoCreateWizard";
+import { getRfqById } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { getSiteOptions, getVendorOptions } from "@/modules/commercial-lifecycle/fixtures/commercial-references";
+import { getCurrentBoq } from "@/modules/commercial-lifecycle/fixtures/boq";
+import { getPurchaseOrdersByBoqId } from "@/modules/commercial-lifecycle/fixtures/po";
+import { buildPoDraftFromBoq } from "@/modules/commercial-lifecycle/lib/po-generation";
+import { PoCreateWizard } from "@/modules/commercial-lifecycle/components/po/PoCreateWizard";
 
 export const metadata: Metadata = { title: "Create PO · SAV ERP" };
 

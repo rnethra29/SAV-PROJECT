@@ -4,14 +4,14 @@ import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { InboxIcon } from "@/components/ui/icons";
 import { MetricCard } from "@/components/dashboard/MetricCard";
-import { PageHeader } from "@/components/commercial/shared/PageHeader";
-import { ProportionBar } from "@/components/commercial/shared/ProportionBar";
-import { getRfqList } from "@/lib/fixtures/rfq";
-import { getCurrentQuotation } from "@/lib/fixtures/quotation";
-import { QuotationStatusBadge, QUOTATION_LABELS, QUOTATION_TONE } from "@/components/commercial/shared/StatusBadges";
+import { PageHeader } from "@/modules/commercial-lifecycle/components/shared/PageHeader";
+import { ProportionBar } from "@/modules/commercial-lifecycle/components/shared/ProportionBar";
+import { getRfqList } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { getCurrentQuotation } from "@/modules/commercial-lifecycle/fixtures/quotation";
+import { QuotationStatusBadge, QUOTATION_LABELS, QUOTATION_TONE } from "@/modules/commercial-lifecycle/components/shared/StatusBadges";
 import { STATUS_TONE_COLOR } from "@/components/ui/StatusBadge";
 import { formatCurrency, formatDate } from "@/lib/format";
-import type { QuotationStatus } from "@/types/commercial/quotation";
+import type { QuotationStatus } from "@/modules/commercial-lifecycle/types/quotation";
 
 export const metadata: Metadata = {
   title: "Quotations · SAV ERP",

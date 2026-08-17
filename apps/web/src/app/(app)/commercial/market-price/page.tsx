@@ -4,10 +4,10 @@ import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SearchIcon } from "@/components/ui/icons";
 import { MetricCard } from "@/components/dashboard/MetricCard";
-import { PageHeader } from "@/components/commercial/shared/PageHeader";
-import { BarRow } from "@/components/commercial/shared/BarRow";
-import { getRfqList, getRfqItems, isHeaderRfqItem } from "@/lib/fixtures/rfq";
-import { getMarketPriceReferencesForRfq } from "@/lib/fixtures/market-price";
+import { PageHeader } from "@/modules/commercial-lifecycle/components/shared/PageHeader";
+import { BarRow } from "@/modules/commercial-lifecycle/components/shared/BarRow";
+import { getRfqList, getRfqItems, isHeaderRfqItem } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { getMarketPriceReferencesForRfq } from "@/modules/commercial-lifecycle/fixtures/market-price";
 
 export const metadata: Metadata = {
   title: "Market Price Analysis · SAV ERP",

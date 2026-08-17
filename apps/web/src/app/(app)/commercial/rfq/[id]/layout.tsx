@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getRfqById, getRfqItems, isHeaderRfqItem } from "@/lib/fixtures/rfq";
-import { getCurrentQuotation } from "@/lib/fixtures/quotation";
-import { RfqStatusBadge } from "@/components/commercial/rfq/RfqStatusBadge";
-import { RfqStatusActions } from "@/components/commercial/rfq/RfqStatusActions";
-import { RfqWorkspaceTabs } from "@/components/commercial/rfq/RfqWorkspaceTabs";
+import { getRfqById, getRfqItems, isHeaderRfqItem } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { getCurrentQuotation } from "@/modules/commercial-lifecycle/fixtures/quotation";
+import { RfqStatusBadge } from "@/modules/commercial-lifecycle/components/rfq/RfqStatusBadge";
+import { RfqStatusActions } from "@/modules/commercial-lifecycle/components/rfq/RfqStatusActions";
+import { RfqWorkspaceTabs } from "@/modules/commercial-lifecycle/components/rfq/RfqWorkspaceTabs";
 import { ChevronLeftIcon } from "@/components/ui/icons";
 import { formatDate } from "@/lib/format";
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { computeRfqAnalysis, computeRfqProfitSummary } from "@/lib/fixtures/analysis";
-import { ProfitAnalysisPanel } from "@/components/commercial/profit/ProfitAnalysisPanel";
+import { computeRfqAnalysis, computeRfqProfitSummary } from "@/modules/commercial-lifecycle/fixtures/analysis";
+import { ProfitAnalysisPanel } from "@/modules/commercial-lifecycle/components/profit/ProfitAnalysisPanel";
 
 export const metadata: Metadata = { title: "Profit Analysis · SAV ERP" };
 

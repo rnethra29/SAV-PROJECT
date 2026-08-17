@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { getRfqItems, isHeaderRfqItem } from "@/lib/fixtures/rfq";
-import { getActualPrice } from "@/lib/fixtures/actual-price";
-import { ActualPriceTable } from "@/components/commercial/actual-price/ActualPriceTable";
+import { getRfqItems, isHeaderRfqItem } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { getActualPrice } from "@/modules/commercial-lifecycle/fixtures/actual-price";
+import { ActualPriceTable } from "@/modules/commercial-lifecycle/components/actual-price/ActualPriceTable";
 
 export const metadata: Metadata = { title: "Actual Price · SAV ERP" };
 

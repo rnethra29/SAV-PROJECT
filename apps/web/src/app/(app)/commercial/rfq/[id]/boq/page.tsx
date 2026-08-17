@@ -4,9 +4,9 @@ import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
 import { LayersIcon, PlusIcon } from "@/components/ui/icons";
-import { getBoqVersions, getBoqItemTree, getBoqItems } from "@/lib/fixtures/boq";
-import { getPurchaseOrdersByBoqId } from "@/lib/fixtures/po";
-import { BoqItemTable } from "@/components/commercial/boq/BoqItemTable";
+import { getBoqVersions, getBoqItemTree, getBoqItems } from "@/modules/commercial-lifecycle/fixtures/boq";
+import { getPurchaseOrdersByBoqId } from "@/modules/commercial-lifecycle/fixtures/po";
+import { BoqItemTable } from "@/modules/commercial-lifecycle/components/boq/BoqItemTable";
 
 export const metadata: Metadata = { title: "BOQ · SAV ERP" };
 

@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LayersIcon } from "@/components/ui/icons";
-import { getRfqItems, isHeaderRfqItem } from "@/lib/fixtures/rfq";
-import { getEstimationByRfqId, getEstimationItems } from "@/lib/fixtures/estimation";
-import { EstimationStatusBadge } from "@/components/commercial/shared/StatusBadges";
-import { EstimationBreakdownTable } from "@/components/commercial/estimation/EstimationBreakdownTable";
+import { getRfqItems, isHeaderRfqItem } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { getEstimationByRfqId, getEstimationItems } from "@/modules/commercial-lifecycle/fixtures/estimation";
+import { EstimationStatusBadge } from "@/modules/commercial-lifecycle/components/shared/StatusBadges";
+import { EstimationBreakdownTable } from "@/modules/commercial-lifecycle/components/estimation/EstimationBreakdownTable";
 import { formatDate } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Estimation · SAV ERP" };

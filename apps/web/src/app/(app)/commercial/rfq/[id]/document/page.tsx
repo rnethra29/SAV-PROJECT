@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeftIcon } from "@/components/ui/icons";
-import { getRfqById, getRfqItemTree } from "@/lib/fixtures/rfq";
-import { getSiteOptions } from "@/lib/fixtures/commercial-references";
-import { getDocuments } from "@/lib/fixtures/documents";
-import { getApprovals } from "@/lib/fixtures/approvals";
-import { RfqDocumentPreview } from "@/components/commercial/rfq/RfqDocumentPreview";
-import { DocumentActionBar } from "@/components/commercial/shared/DocumentActionBar";
+import { getRfqById, getRfqItemTree } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { getSiteOptions } from "@/modules/commercial-lifecycle/fixtures/commercial-references";
+import { getDocuments } from "@/modules/commercial-lifecycle/fixtures/documents";
+import { getApprovals } from "@/modules/commercial-lifecycle/fixtures/approvals";
+import { RfqDocumentPreview } from "@/modules/commercial-lifecycle/components/rfq/RfqDocumentPreview";
+import { DocumentActionBar } from "@/modules/commercial-lifecycle/components/shared/DocumentActionBar";
 
 export const metadata: Metadata = { title: "RFQ Document · SAV ERP" };
 

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { getRfqItems, isHeaderRfqItem } from "@/lib/fixtures/rfq";
-import { getEstimationItemByRfqItemId } from "@/lib/fixtures/estimation";
-import { getMarketPriceReferences } from "@/lib/fixtures/market-price";
-import { MarketPriceAnalysisPanel } from "@/components/commercial/market-price/MarketPriceAnalysisPanel";
+import { getRfqItems, isHeaderRfqItem } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { getEstimationItemByRfqItemId } from "@/modules/commercial-lifecycle/fixtures/estimation";
+import { getMarketPriceReferences } from "@/modules/commercial-lifecycle/fixtures/market-price";
+import { MarketPriceAnalysisPanel } from "@/modules/commercial-lifecycle/components/market-price/MarketPriceAnalysisPanel";
 
 export const metadata: Metadata = { title: "Market Price Analysis · SAV ERP" };
 

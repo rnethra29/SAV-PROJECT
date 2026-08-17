@@ -4,11 +4,11 @@ import { notFound } from "next/navigation";
 import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ChevronLeftIcon, InboxIcon } from "@/components/ui/icons";
-import { getRfqById, getRfqItems } from "@/lib/fixtures/rfq";
-import { getSiteOptions } from "@/lib/fixtures/commercial-references";
-import { getQuotationVersions, getQuotationItems } from "@/lib/fixtures/quotation";
-import { QuotationDocumentPreview, type QuotationDocumentLine } from "@/components/commercial/quotation/QuotationDocumentPreview";
-import { DocumentActionBar } from "@/components/commercial/shared/DocumentActionBar";
+import { getRfqById, getRfqItems } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { getSiteOptions } from "@/modules/commercial-lifecycle/fixtures/commercial-references";
+import { getQuotationVersions, getQuotationItems } from "@/modules/commercial-lifecycle/fixtures/quotation";
+import { QuotationDocumentPreview, type QuotationDocumentLine } from "@/modules/commercial-lifecycle/components/quotation/QuotationDocumentPreview";
+import { DocumentActionBar } from "@/modules/commercial-lifecycle/components/shared/DocumentActionBar";
 
 export const metadata: Metadata = { title: "Quotation Document · SAV ERP" };
 

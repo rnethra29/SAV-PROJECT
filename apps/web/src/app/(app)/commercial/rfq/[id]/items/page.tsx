@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getRfqItemTree } from "@/lib/fixtures/rfq";
-import { RfqItemTree } from "@/components/commercial/rfq/RfqItemTree";
+import { getRfqItemTree } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { RfqItemTree } from "@/modules/commercial-lifecycle/components/rfq/RfqItemTree";
 import { PencilIcon, EyeIcon } from "@/components/ui/icons";
 
 export const metadata: Metadata = { title: "RFQ Items · SAV ERP" };

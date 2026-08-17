@@ -1,50 +1,55 @@
-# SAV ERP — Commercial Lifecycle Module + Sites (Client Management + Vendor Management & Procurement)
+# SAV ERP
 
-Backend API for three SAV ERP modules sharing one deployment:
-- **Commercial Lifecycle**: RFQ → Estimation → Market Price Analysis → Actual vs Quoted → Profit Analysis → Quotation → Client Offer/Negotiation → BOQ → Purchase Order (`com_*` tables).
-- **Sites → Client Management** (submodule): Client Master → Contacts → Requirements → (RFQ..PO, reused from Commercial Lifecycle) → Billing/Invoices → Payments → Client 360° (`clm_client*`/`clm_payment*` tables).
-- **Sites → Vendor Management & Procurement** (submodule): Project (the hub) → Cost Plan → [Vendor → Materials/Services → Procurement PO → Vendor Invoice → Vendor Payment] → Project Expense → Project Financial Summary, plus RBAC (`clm_project*`, `vnd_*`, `sec_*` tables).
+Backend + frontend for the SAV Wind Foundations Construction ERP, organized **business module first**: open the repository root and the folder names tell you the business architecture before you open a single file.
 
-Implements the schema and business rules from [`SAV_ERP_Commercial_Lifecycle_Module_Architecture.md`](SAV_ERP_Commercial_Lifecycle_Module_Architecture.md), [`SAV_ERP_Client_Management_Module_Architecture.md`](SAV_ERP_Client_Management_Module_Architecture.md), and [`SAV_ERP_Sites_Vendor_Procurement_Module_Architecture.md`](SAV_ERP_Sites_Vendor_Procurement_Module_Architecture.md). Node.js/Express + PostgreSQL (Supabase) via `pg`; Supabase Storage for documents; Supabase Auth (JWKS-verified) for authentication.
+```
+SAV-PROJECT/
+├── 01-commercial-lifecycle/     RFQ → Estimation → Market Price → Quotation → Negotiation → BOQ → PO
+├── 02-site/
+│   ├── 01-client-management/    Client Master → Contacts → Requirements → Billing → Payments → Client 360°
+│   ├── 02-vendor-management/    Project → Vendor → Materials/Services → Procurement PO → Vendor Invoice/Payment
+│   └── 03-subcontractor-management/   not started — structural placeholder only
+├── shared/                      backend infrastructure + engines used by every module (config, auth, docs/
+│                                 approvals/audit, RBAC, migration runner) — never duplicated per module
+├── apps/web/                    Next.js frontend (all business-module UI lives inside here per-module, under
+│                                 src/modules/ — see below; Next.js needs one unified app/ route tree)
+├── apps/api/                    Express + Prisma skeleton for the separately-specified Auth/RBAC/Organization
+│                                 foundation (`SAV-ERP-PROJECT-CONTEXT.md` §F) — not yet built beyond a health check
+└── docs/architecture/           cross-cutting docs not scoped to one business module
+```
 
-Both Sites submodules deliberately avoid duplicating existing ground: Client Management references the Commercial Lifecycle module's tables by FK; Vendor Management & Procurement references *both* prior modules and introduces its own **`vnd_purchase_order`** (direct material/service procurement) as a deliberately separate table from `com_po` (the Commercial Lifecycle module's subcontract/work-package PO) — see that doc's §0 reconciliation table for why. All three modules extend the same shared `com_documents`/`com_approvals`/`com_audit_log` engines with new `entity_type`/`action` values instead of creating parallel tables. See each doc's own escalation notes for open items before going fully live (client-master reconciliation against Module 04, the `com_rfq.client_id`/`com_boq.client_id` FK-target reconciliation, and whether `com_po`/`vnd_purchase_order` should ever be merged).
+Each business module also carries its own `ARCHITECTURE.md` (full DDL/API spec) and `README.md` (status + folder guide) — see [`01-commercial-lifecycle/README.md`](01-commercial-lifecycle/README.md), [`02-site/README.md`](02-site/README.md), and [`shared/README.md`](shared/README.md).
+
+## Status
+
+| Module | Frontend | Backend | Database |
+|---|---|---|---|
+| 01 Commercial Lifecycle | Built (fixture-driven, not yet wired to a live API) | Complete | Complete |
+| 02-01 Client Management | Not started | Complete | Complete |
+| 02-02 Vendor Management | Not started | Complete | Complete |
+| 02-03 Subcontractor Management | Not started | Not started | Not started |
+| Auth/RBAC platform (`apps/api`) | Not started | Skeleton (health check only) | Not started (no schema yet) |
 
 ## Quick start
 
 ```bash
 npm install
 cp .env.example .env   # fill in your Supabase project's values
-npm run migrate        # creates enums/tables/indexes/functions/triggers/views
-npm run seed            # populates the 3 lookup tables (item categories, price source types, document categories)
-npm run dev              # http://localhost:4000, docs at /api-docs
-npm test                  # unit tests (business-rule logic - no DB needed)
+npm run migrate        # applies every module's migrations, in the original cross-module dependency order
+npm run seed            # populates every module's lookup tables + baseline RBAC
+npm run dev              # backend on http://localhost:4000, docs at /api-docs
+npm test                  # unit tests across every module (node:test) — business-rule logic, no DB needed
+npm run dev:web            # Next.js frontend, separately (apps/web)
 ```
 
-See [`src/database/README.md`](src/database/README.md) for the database layer and [`src/docs/api.md`](src/docs/api.md) for the full endpoint reference, including the approval-gated status transitions (both modules).
+## Why the backend layers the way it does
 
-## Layout
+Every module's `backend/` follows the same repository → service → controller → validator → route shape, one file per entity — this stayed unchanged by the reorg, only *where* each file lives changed. Genuinely cross-module infrastructure (env/DB config, auth/role/validation middleware, the ENUM and status-transition constants, the polymorphic Documents/Approvals/Audit Log engine, RBAC, and the migration runner) lives in `shared/`, not inside whichever module happened to define it first — see [`shared/README.md`](shared/README.md) for the full list and reasoning.
 
-```
-src/
-  config/       env, Postgres pool, Supabase client, logger, swagger
-  database/     migrations (canonical schema), seeds, migration runner
-  models/       ENUM mirrors, table/view name constants, status state machines, approval stages
-  middlewares/  auth (Supabase JWKS), role gating, Joi validation, error handling
-  utils/        response envelope, ApiError, async handler, word-count/pagination helpers
-  repositories/ SQL data access (one per table/table-group)
-  services/     business rules (versioning, append-only history, transitions, approval gates, audits)
-  controllers/  thin HTTP handlers
-  validators/   Joi request schemas
-  routes/       Express routers, mounted in routes/index.js
-  tests/        unit tests (node:test) for pure business-rule logic
-```
-
-Layered by concern (not by feature) to match this project's existing scaffold. Every module (RFQ, Estimation, Market/Actual Price, Quotation, Negotiation, BOQ, PO, Documents, Approvals, Audit Log, Analysis, the `clm*`-prefixed Client Management files, and the `clmProject*`/`vnd*`/`secRbac`-prefixed Vendor Management & Procurement files) follows the same repository → service → controller → route shape.
+No live API URL changed as part of this reorg — every endpoint is still mounted at exactly the path it was before (e.g. still `/api/v1/rfqs`, `/api/v1/procurement-orders`); only the files implementing them moved.
 
 ## External dependencies
 
-This module deliberately does **not** create `companies`, `branches`, `users`, `employees`, `clients`, `sites`, `currencies`, or `taxes` — those belong to other SAV ERP modules and are referenced here by FK only. `npm run migrate` will stop at the first table that FKs to one of them until that module exists; re-running it later picks up right where it left off. (`vendors` and `projects` *are* created here now, as `vnd_vendor` and `clm_project` — see below.)
+The backend deliberately does **not** create `companies`, `branches`, `users`, `employees`, `clients`, `sites`, `currencies`, or `taxes` — those belong to the future Auth/RBAC/Organization foundation (`apps/api`) and are referenced here by FK only. `npm run migrate` will stop at the first table that FKs to one of them until that foundation exists; re-running it later picks up right where it left off. (`vendors` and `projects` *are* created here already, as `vnd_vendor` and `clm_project` — see `02-site/02-vendor-management/ARCHITECTURE.md`.)
 
-`clm_client` (Client Management) is intentionally a separate table from the external `clients` table that `com_rfq`/`com_boq` already FK to — see the escalation notes at the top of `SAV_ERP_Client_Management_Module_Architecture.md` for the reconciliation this implies before the two are unified.
-
-`vnd_vendor` (Vendor Management & Procurement) is intended to *become* the same physical table `com_po.vendor_id` already assumes as an external `vendors` table (per that doc's §0 reconciliation) — confirm/rename before going live. Likewise `clm_project` fills the "external, assumed" `projects` gap both prior docs left open, but `com_rfq.project_id`/`com_boq.project_id`/`com_po.project_id` still target the external `projects(id)` table as-is (see `004_rfq_tables.sql`) — the same unreconciled-FK-target pattern as `clients`/`clm_client`, called out again in `clm_project`'s own migration comments. Once reconciled, `clm_project` becomes the hub every financial fact in the whole deployment hangs off (`clm_client_invoice`/`vnd_purchase_order`/`vnd_vendor_invoice`/`clm_project_expense` already carry a `project_id` pointing at it today).
+`clm_client` (Client Management) is intentionally a separate table from the external `clients` table that Commercial Lifecycle's `com_rfq`/`com_boq` already FK to, and `clm_project` similarly from the external `projects` table those same tables FK to — both are open reconciliations, flagged in-line in the relevant migration files' header comments and in each module's `ARCHITECTURE.md` escalation notes, not resolved by this reorg.

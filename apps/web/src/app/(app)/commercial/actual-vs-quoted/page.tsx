@@ -4,10 +4,10 @@ import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LayersIcon } from "@/components/ui/icons";
 import { MetricCard } from "@/components/dashboard/MetricCard";
-import { PageHeader } from "@/components/commercial/shared/PageHeader";
-import { BarRow } from "@/components/commercial/shared/BarRow";
-import { getRfqList } from "@/lib/fixtures/rfq";
-import { computeRfqAnalysis } from "@/lib/fixtures/analysis";
+import { PageHeader } from "@/modules/commercial-lifecycle/components/shared/PageHeader";
+import { BarRow } from "@/modules/commercial-lifecycle/components/shared/BarRow";
+import { getRfqList } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { computeRfqAnalysis } from "@/modules/commercial-lifecycle/fixtures/analysis";
 import { formatCurrency, formatPercent } from "@/lib/format";
 
 export const metadata: Metadata = {

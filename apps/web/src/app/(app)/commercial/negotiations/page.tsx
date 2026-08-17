@@ -4,10 +4,10 @@ import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { UsersIcon } from "@/components/ui/icons";
 import { MetricCard } from "@/components/dashboard/MetricCard";
-import { PageHeader } from "@/components/commercial/shared/PageHeader";
-import { getRfqList } from "@/lib/fixtures/rfq";
-import { getCurrentQuotation, getQuotationItems } from "@/lib/fixtures/quotation";
-import { getNegotiationOffersByQuotation } from "@/lib/fixtures/negotiation";
+import { PageHeader } from "@/modules/commercial-lifecycle/components/shared/PageHeader";
+import { getRfqList } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { getCurrentQuotation, getQuotationItems } from "@/modules/commercial-lifecycle/fixtures/quotation";
+import { getNegotiationOffersByQuotation } from "@/modules/commercial-lifecycle/fixtures/negotiation";
 
 export const metadata: Metadata = {
   title: "Negotiations · SAV ERP",

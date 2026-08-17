@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeftIcon } from "@/components/ui/icons";
-import { getRfqById } from "@/lib/fixtures/rfq";
-import { getSiteOptions } from "@/lib/fixtures/commercial-references";
-import { getBoqVersions } from "@/lib/fixtures/boq";
-import { buildBoqDraftFromRfq, buildBoqDraftFromPreviousBoq } from "@/lib/commercial/boq-generation";
-import { BoqCreateWizard } from "@/components/commercial/boq/BoqCreateWizard";
+import { getRfqById } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { getSiteOptions } from "@/modules/commercial-lifecycle/fixtures/commercial-references";
+import { getBoqVersions } from "@/modules/commercial-lifecycle/fixtures/boq";
+import { buildBoqDraftFromRfq, buildBoqDraftFromPreviousBoq } from "@/modules/commercial-lifecycle/lib/boq-generation";
+import { BoqCreateWizard } from "@/modules/commercial-lifecycle/components/boq/BoqCreateWizard";
 
 export const metadata: Metadata = { title: "Create BOQ · SAV ERP" };
 

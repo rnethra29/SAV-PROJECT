@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { getPurchaseOrdersByRfqId } from "@/lib/fixtures/po";
-import { PoListTable } from "@/components/commercial/po/PoListTable";
+import { getPurchaseOrdersByRfqId } from "@/modules/commercial-lifecycle/fixtures/po";
+import { PoListTable } from "@/modules/commercial-lifecycle/components/po/PoListTable";
 
 export const metadata: Metadata = { title: "Purchase Orders · SAV ERP" };
 

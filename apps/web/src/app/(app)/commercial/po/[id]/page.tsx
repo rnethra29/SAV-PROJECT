@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import { Panel } from "@/components/ui/Panel";
 import { Button } from "@/components/ui/Button";
 import { ChevronLeftIcon, EyeIcon } from "@/components/ui/icons";
-import { PoStatusBadge } from "@/components/commercial/shared/StatusBadges";
-import { getPurchaseOrderById, getPoItems } from "@/lib/fixtures/po";
+import { PoStatusBadge } from "@/modules/commercial-lifecycle/components/shared/StatusBadges";
+import { getPurchaseOrderById, getPoItems } from "@/modules/commercial-lifecycle/fixtures/po";
 import { formatCurrency, formatDate } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Purchase Order · SAV ERP" };

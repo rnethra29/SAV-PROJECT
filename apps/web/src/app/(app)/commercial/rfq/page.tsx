@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { RfqListView } from "@/components/commercial/rfq/RfqListView";
-import { PageHeader } from "@/components/commercial/shared/PageHeader";
+import { RfqListView } from "@/modules/commercial-lifecycle/components/rfq/RfqListView";
+import { PageHeader } from "@/modules/commercial-lifecycle/components/shared/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { PlusIcon } from "@/components/ui/icons";
-import { getRfqList } from "@/lib/fixtures/rfq";
+import { getRfqList } from "@/modules/commercial-lifecycle/fixtures/rfq";
 
 export const metadata: Metadata = {
   title: "RFQs · SAV ERP",

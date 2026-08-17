@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { getApprovals } from "@/lib/fixtures/approvals";
-import { ApprovalsPanel } from "@/components/commercial/shared/ApprovalsPanel";
+import { getApprovals } from "@/modules/commercial-lifecycle/fixtures/approvals";
+import { ApprovalsPanel } from "@/modules/commercial-lifecycle/components/shared/ApprovalsPanel";
 
 export const metadata: Metadata = { title: "RFQ Approvals · SAV ERP" };
 

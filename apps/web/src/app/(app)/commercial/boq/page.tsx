@@ -3,11 +3,11 @@ import Link from "next/link";
 import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LayersIcon } from "@/components/ui/icons";
-import { PageHeader } from "@/components/commercial/shared/PageHeader";
-import { getRfqList } from "@/lib/fixtures/rfq";
-import { getCurrentBoq, getBoqItems } from "@/lib/fixtures/boq";
-import { getPurchaseOrdersByBoqId } from "@/lib/fixtures/po";
-import { BoqStatusBadge, BoqTypeBadge } from "@/components/commercial/shared/StatusBadges";
+import { PageHeader } from "@/modules/commercial-lifecycle/components/shared/PageHeader";
+import { getRfqList } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { getCurrentBoq, getBoqItems } from "@/modules/commercial-lifecycle/fixtures/boq";
+import { getPurchaseOrdersByBoqId } from "@/modules/commercial-lifecycle/fixtures/po";
+import { BoqStatusBadge, BoqTypeBadge } from "@/modules/commercial-lifecycle/components/shared/StatusBadges";
 import { formatCurrency, formatDate } from "@/lib/format";
 
 export const metadata: Metadata = {

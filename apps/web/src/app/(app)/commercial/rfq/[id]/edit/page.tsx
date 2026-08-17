@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { RfqFormWizard } from "@/components/commercial/rfq/RfqFormWizard";
+import { RfqFormWizard } from "@/modules/commercial-lifecycle/components/rfq/RfqFormWizard";
 import { ChevronLeftIcon } from "@/components/ui/icons";
-import { getRfqById, getRfqItems, isHeaderRfqItem } from "@/lib/fixtures/rfq";
-import { getClientOptions, getProjectOptions, getSiteOptions } from "@/lib/fixtures/commercial-references";
-import { getItemCategoryOptions } from "@/lib/fixtures/item-categories";
-import type { DraftRfqItem } from "@/components/commercial/rfq/RfqItemsEditor";
+import { getRfqById, getRfqItems, isHeaderRfqItem } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { getClientOptions, getProjectOptions, getSiteOptions } from "@/modules/commercial-lifecycle/fixtures/commercial-references";
+import { getItemCategoryOptions } from "@/modules/commercial-lifecycle/fixtures/item-categories";
+import type { DraftRfqItem } from "@/modules/commercial-lifecycle/components/rfq/RfqItemsEditor";
 
 export const metadata: Metadata = { title: "Edit RFQ · SAV ERP" };
 

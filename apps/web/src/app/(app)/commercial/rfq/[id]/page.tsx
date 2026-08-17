@@ -4,17 +4,17 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Panel } from "@/components/ui/Panel";
 import { MetricCard } from "@/components/dashboard/MetricCard";
-import { RfqStatusWorkflow } from "@/components/commercial/rfq/RfqStatusWorkflow";
-import { getRfqById, getRfqItems, isHeaderRfqItem } from "@/lib/fixtures/rfq";
-import { computeRfqProfitSummary } from "@/lib/fixtures/analysis";
-import { getEstimationByRfqId } from "@/lib/fixtures/estimation";
-import { getCurrentQuotation } from "@/lib/fixtures/quotation";
-import { getCurrentBoq } from "@/lib/fixtures/boq";
-import { getPurchaseOrdersByRfqId } from "@/lib/fixtures/po";
-import { getAuditLog } from "@/lib/fixtures/audit";
+import { RfqStatusWorkflow } from "@/modules/commercial-lifecycle/components/rfq/RfqStatusWorkflow";
+import { getRfqById, getRfqItems, isHeaderRfqItem } from "@/modules/commercial-lifecycle/fixtures/rfq";
+import { computeRfqProfitSummary } from "@/modules/commercial-lifecycle/fixtures/analysis";
+import { getEstimationByRfqId } from "@/modules/commercial-lifecycle/fixtures/estimation";
+import { getCurrentQuotation } from "@/modules/commercial-lifecycle/fixtures/quotation";
+import { getCurrentBoq } from "@/modules/commercial-lifecycle/fixtures/boq";
+import { getPurchaseOrdersByRfqId } from "@/modules/commercial-lifecycle/fixtures/po";
+import { getAuditLog } from "@/modules/commercial-lifecycle/fixtures/audit";
 import { formatCurrency, formatPercent } from "@/lib/format";
-import { EstimationStatusBadge, QuotationStatusBadge, BoqStatusBadge, PoStatusBadge } from "@/components/commercial/shared/StatusBadges";
-import { AuditTrailPanel } from "@/components/commercial/shared/AuditTrailPanel";
+import { EstimationStatusBadge, QuotationStatusBadge, BoqStatusBadge, PoStatusBadge } from "@/modules/commercial-lifecycle/components/shared/StatusBadges";
+import { AuditTrailPanel } from "@/modules/commercial-lifecycle/components/shared/AuditTrailPanel";
 
 export const metadata: Metadata = {
   title: "RFQ Overview · SAV ERP",
