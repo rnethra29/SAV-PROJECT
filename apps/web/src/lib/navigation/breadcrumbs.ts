@@ -1,5 +1,6 @@
 import { getRfqById } from "@/lib/fixtures/rfq";
 import { getPurchaseOrderById } from "@/lib/fixtures/po";
+import { getClientById } from "@/lib/sites/clients-api";
 
 /**
  * Centralized, route-aware breadcrumb source of truth. Add a route here
@@ -8,7 +9,7 @@ import { getPurchaseOrderById } from "@/lib/fixtures/po";
  * the two in sync when routes change.
  */
 
-export type DynamicLabelKey = "rfqNumber" | "poNumber";
+export type DynamicLabelKey = "rfqNumber" | "poNumber" | "clientName";
 
 type RouteNode = {
   // Static label for this segment. Omitted for dynamic (":id") nodes,
@@ -64,6 +65,19 @@ const ROUTE_TREE: Record<string, RouteNode> = {
         label: "Purchase Orders",
         children: {
           ":id": { dynamicKey: "poNumber" },
+        },
+      },
+    },
+  },
+  sites: {
+    label: "Sites",
+    hidden: true,
+    children: {
+      clients: {
+        label: "Clients",
+        children: {
+          new: { label: "New Client" },
+          ":id": { dynamicKey: "clientName" },
         },
       },
     },
@@ -132,6 +146,19 @@ export function buildBreadcrumbTrail(pathname: string): BreadcrumbCrumb[] {
 const DYNAMIC_LABEL_RESOLVERS: Record<DynamicLabelKey, (id: string) => Promise<string | null>> = {
   rfqNumber: async (id) => (await getRfqById(id))?.rfqNumber ?? null,
   poNumber: async (id) => (await getPurchaseOrderById(id))?.poNumber ?? null,
+  // Real backend call (GET /clients/:id), unlike the fixture-backed
+  // resolvers above — clm_client has no fixture layer by design (see
+  // lib/sites/clients-api.ts). A failed/unauthenticated lookup here just
+  // means the fallback uppercased-id label stays up; the page body's own
+  // ClientDetailContainer is the one place that surfaces that failure.
+  clientName: async (id) => {
+    try {
+      const client = await getClientById(id);
+      return client.display_name;
+    } catch {
+      return null;
+    }
+  },
 };
 
 export async function resolveDynamicLabel(key: DynamicLabelKey, id: string): Promise<string | null> {

@@ -46,6 +46,13 @@ const commercialNav: NavItem[] = [
   { label: "Purchase Orders", href: "/commercial/po", icon: BuildingIcon },
 ];
 
+// Sites module -> Client Management submodule (clm_*). Phase 1 frontend
+// scope: nav entry + Client list only — see
+// SAV_ERP_Client_Management_Module_Architecture.md. More entries
+// (Contacts, Requirements, Billing, Payments, Client 360) are added here as
+// their own routes/pages are built, same discipline as commercialNav above.
+const sitesNav: NavItem[] = [{ label: "Clients", href: "/sites/clients", icon: UsersIcon }];
+
 const administrationNav: NavItem[] = [
   { label: "Organization", href: "/administration/organization", icon: BriefcaseIcon },
   { label: "Branches", href: "/administration/branches", icon: BuildingIcon },
@@ -120,6 +127,14 @@ export function Sidebar({ isCollapsed, onToggleCollapse, isMobileOpen, onCloseMo
               </p>
             )}
             <div className="space-y-1">{commercialNav.map(renderLink)}</div>
+          </div>
+          <div>
+            {!isCollapsed && (
+              <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-text-on-sidebar/50">
+                Sites
+              </p>
+            )}
+            <div className="space-y-1">{sitesNav.map(renderLink)}</div>
           </div>
           <div>
             {!isCollapsed && (

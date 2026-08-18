@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { FolderIcon } from "@/components/ui/icons";
@@ -8,25 +9,47 @@ import type { CommercialDocument } from "@/types/commercial/shared";
 type DocumentsPanelProps = {
   documents: CommercialDocument[];
   title?: string;
+  // Both optional, both additive — omitting them keeps every existing
+  // caller's rendered output identical (upload stays disabled, no Actions
+  // column). Only a caller with a real, wired document API (e.g. Client
+  // Management's GET/POST /documents) passes these.
+  onUploadClick?: () => void;
+  renderActions?: (doc: CommercialDocument) => ReactNode;
+  // Rendered above the table/empty-state when onUploadClick is provided —
+  // e.g. an inline upload form toggled by the button.
+  uploadSlot?: ReactNode;
 };
 
-// Upload is intentionally disabled — no Supabase Storage integration exists
-// yet on the frontend (see MODULE-1-COMMERCIAL-LIFECYCLE.md Phase 12).
-// Nothing here pretends a file was actually persisted.
-export function DocumentsPanel({ documents, title = "Documents" }: DocumentsPanelProps) {
+// Upload is disabled by default — no Supabase Storage integration exists
+// yet on the frontend for the Commercial callers of this component (see
+// MODULE-1-COMMERCIAL-LIFECYCLE.md Phase 12). Nothing here pretends a file
+// was actually persisted unless a caller explicitly wires onUploadClick to
+// a real, working upload endpoint.
+export function DocumentsPanel({ documents, title = "Documents", onUploadClick, renderActions, uploadSlot }: DocumentsPanelProps) {
   return (
     <Panel className="bg-surface">
       <div className="flex items-center justify-between border-b border-border p-4">
         <h2 className="text-sm font-semibold text-text-primary">{title}</h2>
-        <button
-          type="button"
-          disabled
-          title="Document upload — coming soon, no storage backend connected yet"
-          className="rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text-secondary disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          Upload Document
-        </button>
+        {onUploadClick ? (
+          <button
+            type="button"
+            onClick={onUploadClick}
+            className="rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text-primary transition hover:bg-background"
+          >
+            Upload Document
+          </button>
+        ) : (
+          <button
+            type="button"
+            disabled
+            title="Document upload — coming soon, no storage backend connected yet"
+            className="rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text-secondary disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Upload Document
+          </button>
+        )}
       </div>
+      {uploadSlot}
       {documents.length === 0 ? (
         <EmptyState
           icon={<FolderIcon className="h-8 w-8" />}
@@ -43,6 +66,7 @@ export function DocumentsPanel({ documents, title = "Documents" }: DocumentsPane
                 <th className="px-5 py-3 font-medium">Size</th>
                 <th className="px-5 py-3 font-medium">Status</th>
                 <th className="px-5 py-3 font-medium">Uploaded</th>
+                {renderActions && <th className="px-5 py-3 font-medium">Actions</th>}
               </tr>
             </thead>
             <tbody>
@@ -60,6 +84,7 @@ export function DocumentsPanel({ documents, title = "Documents" }: DocumentsPane
                     <DocumentStatusBadge status={doc.status} />
                   </td>
                   <td className="px-5 py-3 whitespace-nowrap text-text-secondary">{formatDate(doc.createdAt)}</td>
+                  {renderActions && <td className="px-5 py-3">{renderActions(doc)}</td>}
                 </tr>
               ))}
             </tbody>
