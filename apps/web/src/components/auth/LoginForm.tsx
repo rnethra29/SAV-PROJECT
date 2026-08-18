@@ -1,23 +1,49 @@
 "use client";
 
-import { useRef, useState, type SubmitEvent } from "react";
+import { useEffect, useRef, useState, type SubmitEvent } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
 import { PasswordField } from "@/components/ui/PasswordField";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { AuthAlert } from "@/components/ui/AuthAlert";
+import { useAuth } from "@/lib/supabase/AuthProvider";
+import { getSupabaseClient } from "@/lib/supabase/client";
 
 type LoginCredentials = { email: string; password: string; rememberMe: boolean };
 type LoginResult = { ok: true } | { ok: false; kind: "invalid-credentials" | "service-unavailable" };
 type FieldErrors = { email?: string; password?: string };
 type AuthErrorState = { kind: "invalid-credentials" | "service-unavailable" } | null;
 
-// TEMPORARY — no auth backend exists yet (Module 1 backend not built).
-// Replace this function with a real call through apiFetch("/auth/login", …)
-// once the Express auth endpoint exists. Until then it honestly reports the
-// service as unavailable rather than simulating a credential check.
+/**
+ * Real Supabase Auth sign-in (architecture: User -> Supabase Auth ->
+ * session -> JWT -> apiFetch -> backend, see src/middlewares/auth.middleware.js).
+ * The password goes straight to Supabase over the SDK — it never touches our
+ * own backend and we never store it. Supabase's own error text isn't shown
+ * verbatim (it can be more specific than we want to expose to the client);
+ * it's mapped to the existing two-kind AuthAlert contract instead.
+ */
 async function submitLogin(credentials: LoginCredentials): Promise<LoginResult> {
-  void credentials;
+  let supabase;
+  try {
+    supabase = getSupabaseClient();
+  } catch {
+    return { ok: false, kind: "service-unavailable" };
+  }
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email: credentials.email,
+    password: credentials.password,
+  });
+
+  if (!error) return { ok: true };
+
+  // Supabase reports wrong email/password as a 400; anything else (network,
+  // 5xx, rate limiting) is reported as a generic service issue rather than
+  // leaking Supabase-specific error detail to the user.
+  if (error.status === 400) {
+    return { ok: false, kind: "invalid-credentials" };
+  }
   return { ok: false, kind: "service-unavailable" };
 }
 
@@ -34,6 +60,8 @@ function validatePassword(value: string): string | undefined {
 }
 
 export function LoginForm() {
+  const router = useRouter();
+  const { status: authStatus } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
@@ -42,6 +70,15 @@ export function LoginForm() {
   const [status, setStatus] = useState<"idle" | "submitting">("idle");
   const passwordRef = useRef<HTMLInputElement>(null);
   const submittingRef = useRef(false);
+
+  // Already-authenticated visitors (e.g. a second tab, or the session was
+  // already valid on page load) don't need the form — send them straight to
+  // the app, same destination as a fresh sign-in below.
+  useEffect(() => {
+    if (authStatus === "authenticated") {
+      router.replace("/dashboard");
+    }
+  }, [authStatus, router]);
 
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -73,8 +110,7 @@ export function LoginForm() {
       return;
     }
 
-    // No authenticated destination exists yet (app shell not built).
-    // Real navigation is added once that shell exists.
+    router.replace("/dashboard");
   }
 
   // Forgot Password has no destination screen yet — kept as an isolated,

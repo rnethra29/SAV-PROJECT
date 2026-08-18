@@ -1,14 +1,38 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { MenuIcon, SearchIcon, BellIcon, SunIcon, PlusIcon, ChevronDownIcon } from "@/components/ui/icons";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { useAuth } from "@/lib/supabase/AuthProvider";
 
 type HeaderProps = {
   onOpenMobileNav: () => void;
 };
 
 export function Header({ onOpenMobileNav }: HeaderProps) {
+  const router = useRouter();
+  const { user, signOut } = useAuth();
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isUserMenuOpen) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isUserMenuOpen]);
+
+  async function handleSignOut() {
+    setIsUserMenuOpen(false);
+    await signOut();
+    router.replace("/login");
+  }
+
   // Client-only date: avoided at SSR time to prevent a server/client
   // render-time mismatch, not because the date itself is sensitive.
   const [now, setNow] = useState<Date | null>(null);
@@ -90,9 +114,37 @@ export function Header({ onOpenMobileNav }: HeaderProps) {
           <BellIcon className="h-4 w-4" />
         </button>
 
-        <div className="flex items-center gap-2 border-l border-border pl-2.5 lg:pl-3">
-          <div aria-hidden="true" className="h-8 w-8 rounded-full bg-border" />
-          <ChevronDownIcon className="hidden h-4 w-4 text-text-secondary sm:block" />
+        <div ref={userMenuRef} className="relative flex items-center border-l border-border pl-2.5 lg:pl-3">
+          <button
+            type="button"
+            onClick={() => setIsUserMenuOpen((open) => !open)}
+            aria-haspopup="menu"
+            aria-expanded={isUserMenuOpen}
+            aria-label="Account menu"
+            className="flex items-center gap-2 rounded-lg p-1 transition hover:bg-background"
+          >
+            <div aria-hidden="true" className="h-8 w-8 rounded-full bg-border" />
+            <ChevronDownIcon className="hidden h-4 w-4 text-text-secondary sm:block" />
+          </button>
+
+          {isUserMenuOpen && (
+            <div
+              role="menu"
+              className="absolute right-0 top-full z-20 mt-2 w-56 rounded-lg border border-border bg-surface p-1.5 shadow-[0_4px_16px_-4px_color-mix(in_srgb,var(--text-primary)_16%,transparent)]"
+            >
+              {user?.email && (
+                <p className="truncate px-2.5 py-1.5 text-xs text-text-secondary">{user.email}</p>
+              )}
+              <button
+                type="button"
+                role="menuitem"
+                onClick={handleSignOut}
+                className="w-full rounded-md px-2.5 py-1.5 text-left text-sm text-text-primary transition hover:bg-background"
+              >
+                Sign out
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>
