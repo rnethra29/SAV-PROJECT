@@ -108,6 +108,69 @@ const CLM_PAYMENT_VERIFICATION_TRANSITIONS = {
 };
 
 /**
+ * Vendor Management & Procurement submodule (Sites module) state machines,
+ * plus the `clm_project` extension to Client Management. Same derivation
+ * approach as the maps above - not specified verbatim in that module's
+ * architecture doc (which only enumerates the ENUM value sets, doc §8) -
+ * derived from the workflow narrative in doc §1.1/§13 and the natural
+ * reading of each enum's ordering.
+ */
+const CLM_PROJECT_TRANSITIONS = {
+  Planning: ['Estimation', 'Cancelled'],
+  Estimation: ['Approved', 'Cancelled'],
+  Approved: ['In Progress', 'Cancelled'],
+  'In Progress': ['On Hold', 'Completed', 'Cancelled'],
+  'On Hold': ['In Progress', 'Cancelled'],
+  Completed: [],
+  Cancelled: [],
+};
+
+const VND_VENDOR_TRANSITIONS = {
+  Active: ['Inactive', 'Blacklisted', 'Under Review'],
+  Inactive: ['Active', 'Blacklisted'],
+  'Under Review': ['Active', 'Inactive', 'Blacklisted'],
+  Blacklisted: [],
+};
+
+const VND_PO_TRANSITIONS = {
+  Draft: ['Pending Approval', 'Cancelled'],
+  'Pending Approval': ['Approved', 'Cancelled'],
+  Approved: ['Sent to Vendor', 'Cancelled'],
+  'Sent to Vendor': ['Partially Received', 'Received', 'Cancelled'],
+  'Partially Received': ['Received', 'Cancelled'],
+  Received: ['Closed'],
+  Closed: [],
+  Cancelled: [],
+};
+
+/** Denormalized display column mirroring the doc's two-stage example: Draft -> Submitted -> Manager Approval -> Finance Approval -> Approved -> Sent to Vendor (doc §13). The `com_approvals` rows remain the source of truth; this only constrains the display column's own sequence. */
+const VND_PO_APPROVAL_STATUS_TRANSITIONS = {
+  'Not Required': ['Pending'],
+  Pending: ['Manager Approved', 'Rejected'],
+  'Manager Approved': ['Finance Approved', 'Rejected'],
+  'Finance Approved': [],
+  Rejected: ['Pending'],
+};
+
+const VND_INVOICE_TRANSITIONS = {
+  Draft: ['Submitted', 'Cancelled'],
+  Submitted: ['Verified', 'Disputed', 'Cancelled'],
+  Verified: ['Approved', 'Disputed', 'Cancelled'],
+  Approved: ['Partially Paid', 'Paid', 'Disputed', 'Cancelled'],
+  'Partially Paid': ['Paid', 'Disputed', 'Cancelled'],
+  Disputed: ['Submitted', 'Cancelled'],
+  Paid: [],
+  Cancelled: [],
+};
+
+const VND_PAYMENT_TRANSITIONS = {
+  Pending: ['Processed', 'Failed'],
+  Processed: ['Reversed'],
+  Failed: ['Pending'],
+  Reversed: [],
+};
+
+/**
  * @param {Record<string, string[]>} transitions
  * @param {string} from
  * @param {string} to
@@ -127,5 +190,11 @@ module.exports = {
   CLM_REQUIREMENT_TRANSITIONS,
   CLM_INVOICE_TRANSITIONS,
   CLM_PAYMENT_VERIFICATION_TRANSITIONS,
+  CLM_PROJECT_TRANSITIONS,
+  VND_VENDOR_TRANSITIONS,
+  VND_PO_TRANSITIONS,
+  VND_PO_APPROVAL_STATUS_TRANSITIONS,
+  VND_INVOICE_TRANSITIONS,
+  VND_PAYMENT_TRANSITIONS,
   isValidTransition,
 };

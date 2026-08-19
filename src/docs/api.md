@@ -166,5 +166,85 @@ Reference: [`SAV_ERP_Client_Management_Module_Architecture.md`](../../SAV_ERP_Cl
 ## Lookups (§6.1/§6.2/§6.4 note)
 `GET/POST/PATCH /client-lookups/client-types`, `/industries`, `/contact-types`, plus `POST .../:id/deactivate`.
 
+---
+
+# Sites module — Vendor Management & Procurement submodule
+
+Reference: [`SAV_ERP_Sites_Vendor_Procurement_Module_Architecture.md`](../../SAV_ERP_Sites_Vendor_Procurement_Module_Architecture.md). Owns `clm_project*`/`vnd_*`/`sec_*` only; RFQ→PO, Client Management, Documents, Approvals and Audit Log above are **reused by FK / `entity_type` value**, not redefined (doc §0/§2).
+
+## Projects (§6.1/§6.2, the hub every financial fact hangs off)
+| Method | Path | Notes |
+|---|---|---|
+| GET/POST | `/projects` | POST: Project Manager |
+| GET/PATCH/DELETE | `/projects/:id` | status transitions validated (`CLM_PROJECT_TRANSITIONS`) |
+| GET | `/projects/financial-summaries` | `v_project_financial_summary`, every project in the caller's company |
+| GET | `/projects/:projectId/financial-summary` | `v_project_financial_summary` — contract value → billing → payments → PO → vendor invoice/payment → expense → profit |
+| GET | `/projects/:projectId/cost-summary` | `v_project_cost_summary` — budget vs. actual per category |
+| GET/POST | `/projects/:projectId/cost-plan` | one row per `(project_id, cost_category)`; POST: Project Manager |
+| GET/PATCH | `/project-costs/:id` | no `actual_cost` column - always calculated |
+| GET/POST | `/projects/:projectId/expenses`, `/project-expenses` | POST: Site Engineer, Project Manager; requires `vendor_id`/`purchase_order_id`/`subcontract_po_id` unless `expense_category='Other'` |
+| GET/PATCH/DELETE | `/project-expenses/:id` | |
+| POST | `/project-expenses/:id/approve` | `{ status: 'Approved'\|'Rejected', remarks? }` - Project Manager |
+
+## Vendors (§6.6-§6.10)
+| Method | Path | Notes |
+|---|---|---|
+| GET/POST | `/vendors` | POST: Procurement Manager |
+| GET/PATCH/DELETE | `/vendors/:id` | status transitions validated (`VND_VENDOR_TRANSITIONS`) |
+| GET | `/vendors/:vendorId/performance` | `v_vendor_performance` - objective PO stats + average of subjective ratings |
+| GET | `/vendors/:vendorId/financial-summary` | `v_vendor_financial_summary` |
+| GET/POST | `/vendors/:vendorId/contacts`, `/vendor-contacts/:id` | exactly one primary contact per vendor |
+| GET/POST | `/vendors/:vendorId/bank-accounts`, `/vendor-bank-accounts/:id` | **sensitive** - `account_number`/`upi_id` masked everywhere except `GET .../:id/reveal` (Finance/Procurement Manager only, logged as `action='Download'`) |
+| POST | `/vendor-bank-accounts/:id/verify` | penny-drop/manual verification checkpoint - Finance Manager |
+| GET/POST | `/vendors/:vendorId/materials`, `/vendor-materials/:id` | catalog rate is a reference only - actual PO rate can differ |
+| GET/POST | `/vendors/:vendorId/ratings` | append-only; `overall_rating` is never stored, only averaged in `v_vendor_performance` |
+
+## Procurement Orders (§6.11/§6.12/§13 - `vnd_purchase_order`, distinct from `/purchase-orders` = `com_po`)
+| Method | Path | Notes |
+|---|---|---|
+| GET/POST | `/procurement-orders` | POST: Procurement Officer; header only, `Draft` |
+| GET/PATCH/DELETE | `/procurement-orders/:id` | status transitions validated (`VND_PO_TRANSITIONS`) |
+| POST | `/procurement-orders/:id/submit` | `Draft -> Pending Approval`, requires ≥1 line item |
+| POST | `/procurement-orders/:id/approve` | `{ stage: 'Manager'\|'Finance' }` - each requires a matching Approved `com_approvals` row first (`code: APPROVAL_REQUIRED` otherwise); Finance stage also advances `status -> 'Approved'` |
+| POST | `/procurement-orders/:id/receive` | `{ items: [{poItemId, receivedQuantity}] }` - Site Engineer/Procurement Officer; rolls header up to `Partially Received`/`Received` |
+| POST | `/procurement-orders/:id/cancel` | |
+| GET/POST | `/procurement-orders/:poId/items`, `/procurement-order-items/:id` | only while PO is `Draft`; header `subtotal`/`discount`/`tax`/`total_amount` are trigger-maintained (`trg_vnd_po_totals`), never accepted from the request |
+
+## Vendor Invoices (§6.13/§6.14/§13)
+| Method | Path | Notes |
+|---|---|---|
+| GET/POST | `/vendor-invoices` | POST: Accountant; `invoice_number` is unique per-vendor, not globally |
+| GET/PATCH/DELETE | `/vendor-invoices/:id` | `status -> 'Approved'` requires an Approved `Vendor Invoice Approval` record |
+| GET | `/vendor-invoices/:id/summary` | `v_vendor_invoice_summary` - amount_paid/balance_amount, never stored |
+| POST | `/vendor-invoices/:id/verify` | required checkpoint before any approval stage - Accountant |
+| GET/POST | `/vendor-invoices/:invoiceId/items`, `/vendor-invoice-items/:id` | only while invoice is `Draft`; no `company_id`/audit columns on this table at all (doc §6.14) - authorized via the parent invoice |
+
+## Vendor Payments + Allocations (§6.15/§6.16)
+| Method | Path | Notes |
+|---|---|---|
+| GET/POST | `/vendor-payments` | POST: Accountant |
+| GET/PATCH | `/vendor-payments/:id` | amount immutable once allocated |
+| POST | `/vendor-payments/:id/approve` | Finance Manager stamps `approved_by` - required before `status` can reach `Processed` |
+| POST | `/vendor-payments/:id/status` | `{ status: 'Processed'\|'Failed'\|'Reversed' }` |
+| GET/POST | `/vendor-payments/:paymentId/allocations` | append-only; DB trigger + app-level pre-check guard against over-allocating; on insert, also refreshes `payment_status` on every `clm_project_expense` row tied to that invoice |
+
+## Lookups (§6.4/§6.5)
+`GET/POST/PATCH /vendor-lookups/vendor-types`, `/material-categories`, plus `POST .../:id/deactivate`.
+
+## RBAC (§14, Admin-only)
+| Method | Path | Notes |
+|---|---|---|
+| GET/POST | `/rbac/roles` | |
+| GET/PATCH | `/rbac/roles/:id`, `POST .../deactivate` | |
+| GET/POST | `/rbac/permissions` | |
+| GET/POST/DELETE | `/rbac/roles/:roleId/permissions[/:permissionId]` | |
+| GET/POST/DELETE | `/rbac/users/:userId/roles[/:roleId]` | |
+
+Gated transitions added by this submodule (`src/models/approvalStages.js`):
+| Entity | Gated transition | Stage(s) |
+|---|---|---|
+| Procurement PO | `approval_status: Pending -> Manager Approved -> Finance Approved` (then `status -> 'Approved'`) | `Manager Approval`, `Finance Approval` |
+| Vendor Invoice | `status -> 'Approved'` | `Vendor Invoice Approval` |
+
 ## Auth model
 `auth.middleware.js` verifies the Supabase Auth JWT and expects `company_id`/`branch_id`/`role` custom claims (`app_metadata`), provisioned by a Supabase custom-access-token hook against the external `users`/`employees` tables. `role.middleware.js` gates by the Actors in architecture Phase 1.2 (`models/enums.js: ROLES`); `Admin` always passes.
