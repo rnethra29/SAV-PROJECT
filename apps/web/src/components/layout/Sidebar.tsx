@@ -46,12 +46,20 @@ const commercialNav: NavItem[] = [
   { label: "Purchase Orders", href: "/commercial/po", icon: BuildingIcon },
 ];
 
-// Sites module -> Client Management submodule (clm_*). Phase 1 frontend
-// scope: nav entry + Client list only — see
-// SAV_ERP_Client_Management_Module_Architecture.md. More entries
-// (Contacts, Requirements, Billing, Payments, Client 360) are added here as
-// their own routes/pages are built, same discipline as commercialNav above.
-const sitesNav: NavItem[] = [{ label: "Clients", href: "/sites/clients", icon: UsersIcon }];
+// Sites module -> Client Management + Vendor Management submodules
+// (clm_*/vnd_*). Frontend scope grows one built, non-dead route at a time —
+// see SAV_ERP_Client_Management_Module_Architecture.md and
+// SAV_ERP_Sites_Vendor_Procurement_Module_Architecture.md. Vendors:
+// Checkpoint 1 (list, create, 360 shell with Overview/Contacts/Bank
+// Accounts/Materials) — Purchase Orders/Invoices/Payments/Performance are
+// later checkpoints, not listed here yet.
+const sitesNav: NavItem[] = [
+  { label: "Clients", href: "/sites/clients", icon: UsersIcon },
+  { label: "Vendors", href: "/sites/vendors", icon: BuildingIcon },
+  { label: "Purchase Orders", href: "/sites/procurement", icon: BriefcaseIcon },
+  { label: "Vendor Invoices", href: "/sites/vendor-invoices", icon: FolderIcon },
+  { label: "Vendor Payments", href: "/sites/vendor-payments", icon: ChartBarIcon },
+];
 
 const administrationNav: NavItem[] = [
   { label: "Organization", href: "/administration/organization", icon: BriefcaseIcon },
