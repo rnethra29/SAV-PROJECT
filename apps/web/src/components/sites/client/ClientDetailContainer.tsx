@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/Button";
 import { AlertCircleIcon } from "@/components/ui/icons";
 import { ApiError } from "@/lib/api-client";
 import { getClientById, getClientTypeOptions, getIndustryOptions } from "@/lib/sites/clients-api";
+import { DEV_FIXTURE_MODE } from "@/lib/dev-preview/dev-mode";
+import { devGetClientById, devGetClientTypeOptions, devGetIndustryOptions } from "@/lib/dev-preview/client-fixtures";
 import { ClientDetailView } from "./ClientDetailView";
 import type { ClmClientDetail, ClmClientType, ClmIndustry } from "@/types/sites/client";
 
@@ -38,11 +40,9 @@ export function ClientDetailContainer({ clientId }: ClientDetailContainerProps) 
       // detail response is a plain `SELECT * FROM clm_client` with no join
       // (src/repositories/clmClient.repository.js), so it has no label to
       // give us on its own.
-      const [client, clientTypes, industries] = await Promise.all([
-        getClientById(clientId),
-        getClientTypeOptions(),
-        getIndustryOptions(),
-      ]);
+      const [client, clientTypes, industries] = DEV_FIXTURE_MODE
+        ? await Promise.all([devGetClientById(clientId), devGetClientTypeOptions(), devGetIndustryOptions()])
+        : await Promise.all([getClientById(clientId), getClientTypeOptions(), getIndustryOptions()]);
       setState({ kind: "success", client, clientTypes, industries });
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {

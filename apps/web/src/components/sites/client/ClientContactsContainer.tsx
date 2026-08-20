@@ -5,12 +5,13 @@ import { useRouter } from "next/navigation";
 import { Panel } from "@/components/ui/Panel";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
-import { EmptyState } from "@/components/ui/EmptyState";
-import { StatusBadge } from "@/components/ui/StatusBadge";
-import { AlertCircleIcon, PlusIcon, UsersIcon } from "@/components/ui/icons";
+import { AlertCircleIcon, PlusIcon } from "@/components/ui/icons";
 import { ApiError } from "@/lib/api-client";
 import { createClientContact, getClientContacts, getContactTypeOptions } from "@/lib/sites/client-contacts-api";
+import { DEV_FIXTURE_MODE } from "@/lib/dev-preview/dev-mode";
+import { devCreateClientContact, devGetClientContacts, devGetContactTypeOptions } from "@/lib/dev-preview/client-fixtures";
 import { ClientContactCreateForm } from "./ClientContactCreateForm";
+import { ClientContactsListView } from "./ClientContactsListView";
 import type { ClmClientContact, ClmClientContactCreateInput, ClmContactType } from "@/types/sites/contact";
 
 type LoadState =
@@ -39,7 +40,9 @@ export function ClientContactsContainer({ clientId }: ClientContactsContainerPro
   const load = useCallback(async () => {
     setState({ kind: "loading" });
     try {
-      const [contacts, contactTypes] = await Promise.all([getClientContacts(clientId), getContactTypeOptions()]);
+      const [contacts, contactTypes] = DEV_FIXTURE_MODE
+        ? await Promise.all([devGetClientContacts(clientId), devGetContactTypeOptions()])
+        : await Promise.all([getClientContacts(clientId), getContactTypeOptions()]);
       setState({ kind: "success", contacts, contactTypes });
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {
@@ -67,7 +70,11 @@ export function ClientContactsContainer({ clientId }: ClientContactsContainerPro
   }, [load]);
 
   async function handleCreate(input: ClmClientContactCreateInput) {
-    await createClientContact(clientId, input);
+    if (DEV_FIXTURE_MODE) {
+      await devCreateClientContact(clientId, input);
+    } else {
+      await createClientContact(clientId, input);
+    }
     setIsFormOpen(false);
     await load();
   }
@@ -90,8 +97,6 @@ export function ClientContactsContainer({ clientId }: ClientContactsContainerPro
   }
 
   const { contacts, contactTypes } = state;
-  const contactTypeLabel = (contactTypeId: string) =>
-    contactTypes.find((type) => type.contact_type_id === contactTypeId)?.type_name ?? "—";
 
   return (
     <div className="space-y-2">
@@ -104,49 +109,7 @@ export function ClientContactsContainer({ clientId }: ClientContactsContainerPro
           </Button>
         </div>
 
-        {contacts.length === 0 ? (
-          <EmptyState
-            icon={<UsersIcon className="h-8 w-8" />}
-            title="No contacts yet"
-            description="Add contacts for this client to keep key people and communication details organized."
-          />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-border text-text-secondary">
-                <tr>
-                  <th className="px-5 py-3 font-medium">Name</th>
-                  <th className="px-5 py-3 font-medium">Type</th>
-                  <th className="px-5 py-3 font-medium">Email</th>
-                  <th className="px-5 py-3 font-medium">Phone</th>
-                </tr>
-              </thead>
-              <tbody>
-                {contacts.map((contact) => (
-                  <tr
-                    key={contact.contact_id}
-                    className="border-b border-border last:border-0 hover:bg-background/60"
-                  >
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-text-primary">{contact.contact_name}</span>
-                        {contact.is_primary_contact && <StatusBadge label="Primary" tone="success" />}
-                      </div>
-                      <div className="text-text-secondary">
-                        {[contact.designation, contact.department].filter(Boolean).join(" · ") || "—"}
-                      </div>
-                    </td>
-                    <td className="px-5 py-3 whitespace-nowrap text-text-secondary">
-                      {contactTypeLabel(contact.contact_type_id)}
-                    </td>
-                    <td className="px-5 py-3 whitespace-nowrap text-text-secondary">{contact.email ?? "—"}</td>
-                    <td className="px-5 py-3 whitespace-nowrap text-text-secondary">{contact.phone ?? "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <ClientContactsListView contacts={contacts} contactTypes={contactTypes} />
       </Panel>
 
       {isFormOpen && (

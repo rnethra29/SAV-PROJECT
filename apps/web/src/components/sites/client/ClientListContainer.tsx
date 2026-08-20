@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/Button";
 import { AlertCircleIcon } from "@/components/ui/icons";
 import { ApiError } from "@/lib/api-client";
 import { getClientList } from "@/lib/sites/clients-api";
+import { DEV_FIXTURE_MODE } from "@/lib/dev-preview/dev-mode";
+import { devGetClientList } from "@/lib/dev-preview/client-fixtures";
 import { ClientListView } from "./ClientListView";
 import type { ClmClient } from "@/types/sites/client";
 
@@ -32,7 +34,7 @@ export function ClientListContainer() {
   const load = useCallback(async () => {
     setState({ kind: "loading" });
     try {
-      const { clients } = await getClientList();
+      const { clients } = DEV_FIXTURE_MODE ? await devGetClientList() : await getClientList();
       setState({ kind: "success", clients });
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {

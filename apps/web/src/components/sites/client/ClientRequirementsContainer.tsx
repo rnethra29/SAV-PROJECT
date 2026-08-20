@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 import { Panel } from "@/components/ui/Panel";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Button } from "@/components/ui/Button";
-import { EmptyState } from "@/components/ui/EmptyState";
-import { AlertCircleIcon, FolderIcon, PlusIcon } from "@/components/ui/icons";
+import { AlertCircleIcon, PlusIcon } from "@/components/ui/icons";
 import { ApiError } from "@/lib/api-client";
 import { createClientRequirement, getClientRequirements } from "@/lib/sites/client-requirements-api";
+import { DEV_FIXTURE_MODE } from "@/lib/dev-preview/dev-mode";
+import { devCreateClientRequirement, devGetClientRequirements } from "@/lib/dev-preview/client-fixtures";
 import { ClientRequirementCreateForm } from "./ClientRequirementCreateForm";
-import { RequirementPriorityBadge, RequirementStatusBadge } from "./RequirementBadges";
-import { formatDate } from "@/lib/format";
+import { ClientRequirementsListView } from "./ClientRequirementsListView";
 import type { ClmClientRequirement, ClmClientRequirementCreateInput } from "@/types/sites/requirement";
 
 type LoadState =
@@ -38,7 +38,9 @@ export function ClientRequirementsContainer({ clientId }: ClientRequirementsCont
   const load = useCallback(async () => {
     setState({ kind: "loading" });
     try {
-      const { requirements } = await getClientRequirements(clientId);
+      const { requirements } = DEV_FIXTURE_MODE
+        ? await devGetClientRequirements(clientId)
+        : await getClientRequirements(clientId);
       setState({ kind: "success", requirements });
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {
@@ -66,7 +68,11 @@ export function ClientRequirementsContainer({ clientId }: ClientRequirementsCont
   }, [load]);
 
   async function handleCreate(input: ClmClientRequirementCreateInput) {
-    await createClientRequirement(clientId, input);
+    if (DEV_FIXTURE_MODE) {
+      await devCreateClientRequirement(clientId, input);
+    } else {
+      await createClientRequirement(clientId, input);
+    }
     setIsFormOpen(false);
     await load();
   }
@@ -101,52 +107,7 @@ export function ClientRequirementsContainer({ clientId }: ClientRequirementsCont
           </Button>
         </div>
 
-        {requirements.length === 0 ? (
-          <EmptyState
-            icon={<FolderIcon className="h-8 w-8" />}
-            title="No requirements yet"
-            description="Log the client's first requirement to start the pre-RFQ trail."
-          />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-border text-text-secondary">
-                <tr>
-                  <th className="px-5 py-3 font-medium">Requirement</th>
-                  <th className="px-5 py-3 font-medium">Received</th>
-                  <th className="px-5 py-3 font-medium">Due</th>
-                  <th className="px-5 py-3 font-medium">Priority</th>
-                  <th className="px-5 py-3 font-medium">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {requirements.map((requirement) => (
-                  <tr
-                    key={requirement.requirement_id}
-                    className="border-b border-border last:border-0 hover:bg-background/60"
-                  >
-                    <td className="px-5 py-3">
-                      <div className="font-medium text-text-primary">{requirement.requirement_title}</div>
-                      <div className="text-text-secondary">{requirement.requirement_number}</div>
-                    </td>
-                    <td className="px-5 py-3 whitespace-nowrap text-text-secondary">
-                      {formatDate(requirement.received_date)}
-                    </td>
-                    <td className="px-5 py-3 whitespace-nowrap text-text-secondary">
-                      {formatDate(requirement.required_completion_date)}
-                    </td>
-                    <td className="px-5 py-3">
-                      <RequirementPriorityBadge priority={requirement.priority} />
-                    </td>
-                    <td className="px-5 py-3">
-                      <RequirementStatusBadge status={requirement.requirement_status} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <ClientRequirementsListView requirements={requirements} />
       </Panel>
 
       {isFormOpen && (

@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/Button";
 import { AlertCircleIcon } from "@/components/ui/icons";
 import { ApiError } from "@/lib/api-client";
 import { getClientTypeOptions, getIndustryOptions } from "@/lib/sites/clients-api";
+import { DEV_FIXTURE_MODE } from "@/lib/dev-preview/dev-mode";
+import { devGetClientTypeOptions, devGetIndustryOptions } from "@/lib/dev-preview/client-fixtures";
 import { ClientCreateForm } from "./ClientCreateForm";
 import type { ClmClientType, ClmIndustry } from "@/types/sites/client";
 
@@ -30,7 +32,9 @@ export function ClientCreateContainer() {
   const load = useCallback(async () => {
     setState({ kind: "loading" });
     try {
-      const [clientTypes, industries] = await Promise.all([getClientTypeOptions(), getIndustryOptions()]);
+      const [clientTypes, industries] = DEV_FIXTURE_MODE
+        ? await Promise.all([devGetClientTypeOptions(), devGetIndustryOptions()])
+        : await Promise.all([getClientTypeOptions(), getIndustryOptions()]);
       setState({ kind: "success", clientTypes, industries });
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {

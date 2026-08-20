@@ -14,6 +14,13 @@ import {
   getDocumentCategoryOptions,
   uploadClientDocument,
 } from "@/lib/sites/client-documents-api";
+import { DEV_FIXTURE_MODE } from "@/lib/dev-preview/dev-mode";
+import {
+  devGetClientDocumentDownloadUrl,
+  devGetClientDocuments,
+  devGetDocumentCategoryOptions,
+  devUploadClientDocument,
+} from "@/lib/dev-preview/client-fixtures";
 import { ClientDocumentUploadForm } from "./ClientDocumentUploadForm";
 import type { CommercialDocument } from "@/types/commercial/shared";
 import type { DocumentCategory } from "@/types/sites/document";
@@ -46,10 +53,9 @@ export function ClientDocumentsContainer({ clientId }: ClientDocumentsContainerP
   const load = useCallback(async () => {
     setState({ kind: "loading" });
     try {
-      const [documents, categories] = await Promise.all([
-        getClientDocuments(clientId),
-        getDocumentCategoryOptions(),
-      ]);
+      const [documents, categories] = DEV_FIXTURE_MODE
+        ? await Promise.all([devGetClientDocuments(clientId), devGetDocumentCategoryOptions()])
+        : await Promise.all([getClientDocuments(clientId), getDocumentCategoryOptions()]);
       setState({ kind: "success", documents, categories });
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {
@@ -77,7 +83,11 @@ export function ClientDocumentsContainer({ clientId }: ClientDocumentsContainerP
   }, [load]);
 
   async function handleUpload(input: { file: File; documentCategoryId: string; description: string }) {
-    await uploadClientDocument(clientId, input);
+    if (DEV_FIXTURE_MODE) {
+      await devUploadClientDocument(clientId, input);
+    } else {
+      await uploadClientDocument(clientId, input);
+    }
     setIsUploadFormOpen(false);
     await load();
   }
@@ -86,10 +96,14 @@ export function ClientDocumentsContainer({ clientId }: ClientDocumentsContainerP
     setDownloadError(null);
     setDownloadingId(doc.id);
     try {
-      const url = await getClientDocumentDownloadUrl(doc.id);
+      const url = DEV_FIXTURE_MODE ? await devGetClientDocumentDownloadUrl() : await getClientDocumentDownloadUrl(doc.id);
       window.open(url, "_blank", "noopener,noreferrer");
     } catch {
-      setDownloadError("Couldn't generate a download link. Try again.");
+      setDownloadError(
+        DEV_FIXTURE_MODE
+          ? "Document download isn't available in development fixture mode — no file storage is connected."
+          : "Couldn't generate a download link. Try again.",
+      );
     } finally {
       setDownloadingId(null);
     }

@@ -2,10 +2,11 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Panel } from "@/components/ui/Panel";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
-import { SearchIcon, UsersIcon, PlusIcon } from "@/components/ui/icons";
+import { SearchIcon, UsersIcon, PlusIcon, ArrowRightIcon } from "@/components/ui/icons";
 import { ClientStatusBadge } from "./ClientStatusBadge";
 import type { ClmClient } from "@/types/sites/client";
 
@@ -14,6 +15,7 @@ type ClientListViewProps = {
 };
 
 export function ClientListView({ clients }: ClientListViewProps) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
 
   const visibleClients = useMemo(() => {
@@ -84,7 +86,8 @@ export function ClientListView({ clients }: ClientListViewProps) {
               {visibleClients.map((client) => (
                 <tr
                   key={client.client_id}
-                  className="border-b border-border transition-colors last:border-0 hover:bg-background/60"
+                  onClick={() => router.push(`/sites/clients/${client.client_id}`)}
+                  className="group cursor-pointer border-b border-border transition-colors last:border-0 hover:bg-background/60"
                 >
                   <td className="px-5 py-3 font-medium text-text-primary">
                     <Link
@@ -95,11 +98,14 @@ export function ClientListView({ clients }: ClientListViewProps) {
                     </Link>
                   </td>
                   <td className="px-5 py-3">
-                    <Link href={`/sites/clients/${client.client_id}`} className="block">
-                      <div className="text-text-primary hover:text-secondary hover:underline underline-offset-2">
-                        {client.display_name}
+                    <Link href={`/sites/clients/${client.client_id}`} className="flex items-center gap-1.5">
+                      <div>
+                        <div className="text-text-primary group-hover:text-secondary group-hover:underline underline-offset-2">
+                          {client.display_name}
+                        </div>
+                        <div className="text-text-secondary">{client.legal_name}</div>
                       </div>
-                      <div className="text-text-secondary">{client.legal_name}</div>
+                      <ArrowRightIcon className="h-3.5 w-3.5 shrink-0 text-secondary opacity-0 transition-opacity group-hover:opacity-100" />
                     </Link>
                   </td>
                   <td className="px-5 py-3 whitespace-nowrap text-text-secondary">

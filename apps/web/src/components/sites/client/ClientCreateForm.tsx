@@ -10,6 +10,8 @@ import { Select } from "@/components/ui/Select";
 import { AlertCircleIcon } from "@/components/ui/icons";
 import { ApiError } from "@/lib/api-client";
 import { createClient } from "@/lib/sites/clients-api";
+import { DEV_FIXTURE_MODE } from "@/lib/dev-preview/dev-mode";
+import { devCreateClient } from "@/lib/dev-preview/client-fixtures";
 import type { ClmClientCreateInput, ClmClientStatus, ClmClientType, ClmIndustry } from "@/types/sites/client";
 
 type ClientCreateFormProps = {
@@ -230,7 +232,13 @@ export function ClientCreateForm({ clientTypes, industries }: ClientCreateFormPr
 
     setStatus("submitting");
     try {
-      const created = await createClient(toCreateInput(draft));
+      // Development fixture mode: "creates" only update the in-memory dev
+      // store (client-fixtures.ts) — never a real POST /clients call, never
+      // persisted. Same success path (navigate to the new client's detail
+      // page) so the form's real UX is still fully demonstrable.
+      const created = DEV_FIXTURE_MODE
+        ? await devCreateClient(toCreateInput(draft))
+        : await createClient(toCreateInput(draft));
       router.replace(`/sites/clients/${created.client_id}`);
       return;
     } catch (error) {
