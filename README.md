@@ -9,14 +9,35 @@ Implements the schema and business rules from [`SAV_ERP_Commercial_Lifecycle_Mod
 
 Both Sites submodules deliberately avoid duplicating existing ground: Client Management references the Commercial Lifecycle module's tables by FK; Vendor Management & Procurement references *both* prior modules and introduces its own **`vnd_purchase_order`** (direct material/service procurement) as a deliberately separate table from `com_po` (the Commercial Lifecycle module's subcontract/work-package PO) — see that doc's §0 reconciliation table for why. All three modules extend the same shared `com_documents`/`com_approvals`/`com_audit_log` engines with new `entity_type`/`action` values instead of creating parallel tables. See each doc's own escalation notes for open items before going fully live (client-master reconciliation against Module 04, the `com_rfq.client_id`/`com_boq.client_id` FK-target reconciliation, and whether `com_po`/`vnd_purchase_order` should ever be merged).
 
-## Quick start
+## Running locally (Frontend)
+
+The frontend (`apps/web`, Next.js) is what `npm run dev` runs from the repository root. It can be browsed on its own — no backend, database, or Supabase project required — via an isolated, in-memory development fixture layer (`DEV_FIXTURE_MODE`).
+
+```bash
+git clone <repository-url>
+cd SAV-PROJECT
+npm install     # installs both apps/web and the backend, via npm workspaces
+npm run dev     # starts the frontend (apps/web) — http://localhost:3000
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+By default the frontend calls the real backend API and Supabase Auth, neither of which is required to browse it. To see the app with realistic sample data and skip both, create `apps/web/.env.local` (gitignored, never committed) with:
+
+```
+NEXT_PUBLIC_DEV_BYPASS_AUTH=true
+```
+
+This bypasses the login redirect and swaps every Client Management / Vendor Management / Procurement data call for an isolated in-memory fixture store instead of a real API call — it has no effect on `next build`/`next start` (Next.js hard-sets `NODE_ENV=production` for real builds regardless of this flag), so it can never leak into a production build.
+
+## Backend quick start (API)
 
 ```bash
 npm install
 cp .env.example .env   # fill in your Supabase project's values
 npm run migrate        # creates enums/tables/indexes/functions/triggers/views
 npm run seed            # populates the 3 lookup tables (item categories, price source types, document categories)
-npm run dev              # http://localhost:4000, docs at /api-docs
+npm run dev:server       # http://localhost:4000, docs at /api-docs
 npm test                  # unit tests (business-rule logic - no DB needed)
 ```
 
